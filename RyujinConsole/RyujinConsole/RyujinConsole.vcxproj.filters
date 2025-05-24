@@ -25,6 +25,9 @@
     <Filter Include="Ryujin\Models">
       <UniqueIdentifier>{df02e440-42fd-4d5d-ace9-62fb1891e33c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Ryujin\RyujinCore">
+      <UniqueIdentifier>{cc8cdc69-0dce-4cc2-9b0d-6bba400b9599}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Ryujin\Utils\RyujinUtils.cc">
@@ -35,6 +38,9 @@
     </ClCompile>
     <ClCompile Include="RyujinConsole.cc">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ryujin\RyujinCore\BasicBlockerBuilder.cc">
+      <Filter>Ryujin\RyujinCore</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -58,6 +64,9 @@
     </ClInclude>
     <ClInclude Include="Ryujin\Ryujin.hh">
       <Filter>Ryujin</Filter>
+    </ClInclude>
+    <ClInclude Include="Ryujin\RyujinCore\BasicBlockerBuilder.hh">
+      <Filter>Ryujin\RyujinCore</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -91,13 +91,13 @@ bool Ryujin::run(const RyujinObfuscatorConfig& config) {
 		return FALSE;
 	}
 
-	for (const auto& proc : m_ryujinProcedures) {
+	for (auto& proc : m_ryujinProcedures) {
 
 		auto it = std::find(config.m_strProceduresToObfuscate.begin(), config.m_strProceduresToObfuscate.end(), proc.name);
 
 		if (it == config.m_strProceduresToObfuscate.end()) continue;
 
-		std::printf("[WORKING ON]: %s\n", proc.name);
+		std::printf("[WORKING ON]: %s\n", proc.name.c_str());
 
 		// Is a valid procedure ?
 		if (proc.size == 0) {
@@ -111,8 +111,22 @@ bool Ryujin::run(const RyujinObfuscatorConfig& config) {
 			continue;
 		}
 
-		//Create basic blocks
+		//Get procedure opcodes from mapped pe file
+		auto ucOpcodes = new unsigned char[proc.size] { 0 };
+		std::memcpy(
+			
+			ucOpcodes,
+			reinterpret_cast<void*>(proc.address),
+			proc.size
+		
+		);
 
+		//Create basic blocks
+		RyujinBasicBlockerBuilder rybb(ZYDIS_MACHINE_MODE_LONG_64, ZydisStackWidth_::ZYDIS_STACK_WIDTH_64);
+		proc.basic_blocks = rybb.createBasicBlocks(ucOpcodes, proc.size, proc.address);
+
+		//Clean up opcodes
+		delete[] ucOpcodes;
 
 	}
 

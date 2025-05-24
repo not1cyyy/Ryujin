@@ -7,6 +7,7 @@
 #include "PDB/RyujinPdbParsing.hh"
 #include "Utils/RyujinUtils.hh"
 #include "Models/RyujinObfuscatorConfig.hh"
+#include "RyujinCore/BasicBlockerBuilder.hh"
 
 class Ryujin {
 
