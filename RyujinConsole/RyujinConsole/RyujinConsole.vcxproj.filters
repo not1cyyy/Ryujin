@@ -27,37 +27,37 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Ryujin.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RyujinUtils.cc">
+    <ClCompile Include="Ryujin\Utils\RyujinUtils.cc">
       <Filter>Ryujin\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="RyujinConsole.cc">
+    <ClCompile Include="Ryujin\Ryujin.cc">
       <Filter>Ryujin</Filter>
+    </ClCompile>
+    <ClCompile Include="RyujinConsole.cc">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RyujinUtils.hh">
-      <Filter>Ryujin\Utils</Filter>
+    <ClInclude Include="Ryujin\Models\RyujinBasicBlock.hh">
+      <Filter>Ryujin\Models</Filter>
     </ClInclude>
-    <ClInclude Include="RyujinPdbParsing.hh">
+    <ClInclude Include="Ryujin\Models\RyujinInstruction.hh">
+      <Filter>Ryujin\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="Ryujin\Models\RyujinObfuscatorConfig.hh">
+      <Filter>Ryujin\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="Ryujin\Models\RyujinProcedure.hh">
+      <Filter>Ryujin\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="Ryujin\PDB\RyujinPdbParsing.hh">
       <Filter>Ryujin\PDB</Filter>
     </ClInclude>
-    <ClInclude Include="Ryujin.hh">
+    <ClInclude Include="Ryujin\Utils\RyujinUtils.hh">
+      <Filter>Ryujin\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Ryujin\Ryujin.hh">
       <Filter>Ryujin</Filter>
-    </ClInclude>
-    <ClInclude Include="RyujinProcedure.hh">
-      <Filter>Ryujin\Models</Filter>
-    </ClInclude>
-    <ClInclude Include="RyujinBasicBlock.hh">
-      <Filter>Ryujin\Models</Filter>
-    </ClInclude>
-    <ClInclude Include="RyujinInstruction.hh">
-      <Filter>Ryujin\Models</Filter>
-    </ClInclude>
-    <ClInclude Include="RyujinObfuscatorConfig.hh">
-      <Filter>Ryujin\Models</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

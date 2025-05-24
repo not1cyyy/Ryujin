@@ -4,9 +4,9 @@
 #include <iostream>
 #include <memory>
 #include <vector>
-#include "RyujinPdbParsing.hh"
-#include "RyujinUtils.hh"
-#include "RyujinObfuscatorConfig.hh"
+#include "PDB/RyujinPdbParsing.hh"
+#include "Utils/RyujinUtils.hh"
+#include "Models/RyujinObfuscatorConfig.hh"
 
 class Ryujin {
 

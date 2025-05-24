@@ -131,18 +131,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Ryujin.cc" />
     <ClCompile Include="RyujinConsole.cc" />
-    <ClCompile Include="RyujinUtils.cc" />
+    <ClCompile Include="Ryujin\Ryujin.cc" />
+    <ClCompile Include="Ryujin\Utils\RyujinUtils.cc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Ryujin.hh" />
-    <ClInclude Include="RyujinBasicBlock.hh" />
-    <ClInclude Include="RyujinInstruction.hh" />
-    <ClInclude Include="RyujinObfuscatorConfig.hh" />
-    <ClInclude Include="RyujinPdbParsing.hh" />
-    <ClInclude Include="RyujinProcedure.hh" />
-    <ClInclude Include="RyujinUtils.hh" />
+    <ClInclude Include="Ryujin\Models\RyujinBasicBlock.hh" />
+    <ClInclude Include="Ryujin\Models\RyujinInstruction.hh" />
+    <ClInclude Include="Ryujin\Models\RyujinObfuscatorConfig.hh" />
+    <ClInclude Include="Ryujin\Models\RyujinProcedure.hh" />
+    <ClInclude Include="Ryujin\PDB\RyujinPdbParsing.hh" />
+    <ClInclude Include="Ryujin\Ryujin.hh" />
+    <ClInclude Include="Ryujin\Utils\RyujinUtils.hh" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,5 +1,5 @@
 #pragma once
-#include "Ryujin/Models/RyujinBasicBlock.hh"
+#include "RyujinBasicBlock.hh"
 
 class RyujinProcedure {
 

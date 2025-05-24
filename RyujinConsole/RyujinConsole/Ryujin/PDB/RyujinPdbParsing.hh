@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <dbghelp.h>
 #pragma comment(lib, "DbgHelp.lib")
-#include "RyujinProcedure.hh"
+#include "../Models/RyujinProcedure.hh"
 
 #define SymTagFunction 5
 

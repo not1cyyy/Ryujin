@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Ryujin.hh"
+#include "Ryujin/Ryujin.hh"
 
 auto main() -> int {
 
