@@ -97,7 +97,12 @@ bool Ryujin::run(const RyujinObfuscatorConfig& config) {
 
 		if (it == config.m_strProceduresToObfuscate.end()) continue;
 
-		std::printf("[WORKING ON]: %s\n", proc.name.c_str());
+		std::printf(
+			
+			"[WORKING ON]: %s\n",
+			proc.name.c_str()
+		
+		);
 
 		// Is a valid procedure ?
 		if (proc.size == 0) {
@@ -125,10 +130,29 @@ bool Ryujin::run(const RyujinObfuscatorConfig& config) {
 		RyujinBasicBlockerBuilder rybb(ZYDIS_MACHINE_MODE_LONG_64, ZydisStackWidth_::ZYDIS_STACK_WIDTH_64);
 		proc.basic_blocks = rybb.createBasicBlocks(ucOpcodes, proc.size, proc.address);
 
+		//Is time to obfuscate ?
+		if (config.m_isVirtualized) todoAction();
+		if (config.m_isIatObfuscation) todoAction();
+		if (config.m_isJunkCode) todoAction();
+
+		//TODO: Custom passes support
+
 		//Clean up opcodes
 		delete[] ucOpcodes;
 
 	}
+
+	//More obfuscation
+	if (config.m_isIgnoreOriginalCodeRemove) todoAction();
+
+	//Add section
+	char chSectionName[8]{ '.', 'R', 'y', 'u', 'j', 'i', 'n', '\0' };
+	if (config.m_isRandomSection) RyujinUtils::randomizeSectionName(chSectionName);
+	RyujinUtils::AddNewSection(m_mappedPE, m_szFile, chSectionName);
+
+	//Fix relocations
+
+	//Save output file
 
 }
 

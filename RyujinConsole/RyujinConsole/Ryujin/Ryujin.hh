@@ -20,6 +20,8 @@ private:
 	BOOL m_isInitialized;
 	std::vector<RyujinProcedure> m_ryujinProcedures;
 
+	bool todoAction() { return FALSE;  }
+
 public:
 	Ryujin(const std::string& strInputFilePath, const std::string& strPdbFilePath, const std::string& strOutputFilePath);
 	bool run(const RyujinObfuscatorConfig& config);
