@@ -53,10 +53,10 @@ BOOL RyujinObfuscationCore::extractUnusedRegisters() {
 
 				if (op.type == ZYDIS_OPERAND_TYPE_REGISTER) usedRegs.insert(op.reg.value);
 				else if (op.type == ZYDIS_OPERAND_TYPE_POINTER) {
-				
+
 					if (op.mem.base != ZYDIS_REGISTER_NONE) usedRegs.insert(op.mem.base);
 					if (op.mem.index != ZYDIS_REGISTER_NONE) usedRegs.insert(op.mem.index);
-				
+
 				}
 
 			}
@@ -152,14 +152,14 @@ void RyujinObfuscationCore::obfuscateIat() {
 				}
 
 				opcode_id++;
-			
+
 			}
 
 			block_id++;
 		}
 
 		return std::make_pair(-1, -1);
-	};
+		};
 
 	for (auto& block : m_obfuscated_bb) {
 
@@ -186,23 +186,76 @@ void RyujinObfuscationCore::obfuscateIat() {
 				const uintptr_t next_instruction_address = orInstr.addressofinstruction + orInstr.instruction.info.length;
 
 				// Calculating the target address of the IAT using the memory immediate from the original instruction
-				const uint32_t iat_target_rva = (next_instruction_address + orInstr.instruction.operands->mem.disp.value) - m_ProcImageBase;
+				uint32_t iat_target_rva = (next_instruction_address + orInstr.instruction.operands->mem.disp.value) - m_ProcImageBase;
+
+				/*
+					Let's obfuscate our RVA
+				*/
+				// Generating two random bytes for the key
+				std::mt19937 rng(std::random_device{}());
+				// A single random value of 2 bytes (uint16_t)
+				std::uniform_int_distribution<uint16_t> dist(0, 0xFFFF);
+				uint16_t xorKey = dist(rng);
+
+				// Obfsucate the RVA with a XOR
+				iat_target_rva ^= xorKey;
+
+				// Obfuscate PEB offset from automatic scan
+				unsigned char PebGsOffset  = 0x60 ^ (xorKey & 0xFF);
+				unsigned char ImageBasePeb = 0x10 ^ (xorKey & 0xFF);
 
 				// A new vector to store our corrected IAT
 				std::vector<ZyanU8> new_iat_call;
 
-				unsigned char pebRecoverModuleBase[24]{
-					0x65, 0x48, 0x8B, 0x04, 0x25, 0x60, 0x00, 0x00, 0x00, // mov rax, gs:60h
-					0x48, 0x8B, 0x40, 0x10, // mov rax, qword ptr ds:[rax+0x10]
-					0x48, 0x05, 0x00, 0x00, 0x00, 0x00, // add     rax, 22228h
-					0x48, 0x8B, 0x00, //mov rax, qword ptr ds:[rax] -> Recover the IAT jump value stored in the data segment
-					0xFF, 0xD0//call rax
-				};
+				//Begin ASMJIT configuration
+				asmjit::JitRuntime runtime;
+				asmjit::CodeHolder code;
+				code.init(runtime.environment());
+				asmjit::x86::Assembler a(&code);
 
-				std::memcpy(&*(pebRecoverModuleBase + 15), &iat_target_rva, sizeof(uint32_t));
+				// Using `rdgsbase rax` to store the base address of the GS segment in RAX -> rdgsbase rax
+				a.emit(asmjit::x86::Inst::kIdRdgsbase, asmjit::x86::rax);
 
-				new_iat_call.insert(new_iat_call.end(), std::begin(pebRecoverModuleBase), std::end(pebRecoverModuleBase));
+				// Adding the obfuscated offset of the PEB in the GS segment -> add rax, PebGsOffset
+				a.add(asmjit::x86::rax, PebGsOffset);
+
+				// Undoing the XOR operation with the obfuscated RAX value and the XOR key -> xor rax, lastByteXorKey
+				a.xor_(asmjit::x86::rax, asmjit::imm(xorKey & 0xFF));
+
+				// Accessing the resulting address to retrieve the PEB instance -> mov rax, [rax]
+				a.mov(asmjit::x86::rax, asmjit::x86::ptr(asmjit::x86::rax));
+
+				// Adding the obfuscated offset of the ImageBase field in the PEB -> add rax, ImageBasePeb
+				a.add(asmjit::x86::rax, ImageBasePeb);
+
+				// Undoing the XOR operation with the obfuscated value and the XOR key -> xor rax, lastByteXorKey
+				a.xor_(asmjit::x86::rax, asmjit::imm(xorKey & 0xFF));
+
+				// Accessing the resulting address to retrieve the PEB+ImageBase instance -> mov rax, [rax]
+				a.mov(asmjit::x86::rax, asmjit::x86::ptr(asmjit::x86::rax));
+
+				// Adding the RVA that points to the entry in the IAT -> add rax, imm32 -> Adding the offset of the IAT entry
+				a.add(asmjit::x86::rax, asmjit::imm(iat_target_rva));
 				
+				// Undoing the XOR operation with the obfuscated value and the XOR key -> xor rax, xorKey
+				a.xor_(asmjit::x86::rax, asmjit::imm(xorKey));
+
+				// mov rax, [rax] -> retrieving the resolved address for the IAT entry by the OS loader
+				a.mov(asmjit::x86::rax, asmjit::x86::ptr(asmjit::x86::rax));
+
+				// call rax -> Calling the IAT
+				a.call(asmjit::x86::rax);
+
+				// Obtaining the new section buffer
+				auto& opcodeBuffer = code.sectionById(0)->buffer();
+				// Obtaining the pointer to the buffer of raw opcode data generated
+				const auto pOpcodeBuffer = opcodeBuffer.data();
+				// Reserving space in the IAT vector
+				new_iat_call.reserve(opcodeBuffer.size());
+
+				// Storing each opcode individually in the vector for our new IAT call
+				for (auto i = 0; i < opcodeBuffer.size(); ++i) new_iat_call.push_back(static_cast<ZyanU8>(pOpcodeBuffer[i]));
+
 				// Replacing opcodes of the call in question with the new ones
 				data.assign(new_iat_call.begin(), new_iat_call.end());
 
@@ -245,16 +298,15 @@ BOOL RyujinObfuscationCore::Run() {
 	}
 
 	/*
-
-	if (config.m_isVirtualized) todoAction();
 	if (config.m_isJunkCode) todoAction();
+	if (config.m_isVirtualized) todoAction();
 	*/
 
 	return TRUE;
 }
 
 uint32_t RyujinObfuscationCore::findOpcodeOffset(const uint8_t* data, size_t dataSize, const void* opcode, size_t opcodeSize) {
-	
+
 	if (opcodeSize == 0 || dataSize < opcodeSize) return 0;
 
 	for (size_t i = 0; i <= dataSize - opcodeSize; ++i) if (std::memcmp(data + i, opcode, opcodeSize) == 0) return static_cast<uint32_t>(i);
@@ -263,14 +315,14 @@ uint32_t RyujinObfuscationCore::findOpcodeOffset(const uint8_t* data, size_t dat
 }
 
 std::vector<uint8_t> RyujinObfuscationCore::fix_branch_near_far_short(uint8_t original_opcode, uint64_t jmp_address, uint64_t target_address) {
-	
+
 	static const std::unordered_map<uint8_t, uint8_t> SHORT_TO_NEAR = {
 
 		{ 0x70, 0x80 }, { 0x71, 0x81 }, { 0x72, 0x82 }, { 0x73, 0x83 },
 		{ 0x74, 0x84 }, { 0x75, 0x85 }, { 0x76, 0x86 }, { 0x77, 0x87 },
 		{ 0x78, 0x88 }, { 0x79, 0x89 }, { 0x7A, 0x8A }, { 0x7B, 0x8B },
 		{ 0x7C, 0x8C }, { 0x7D, 0x8D }, { 0x7E, 0x8E }, { 0x7F, 0x8F }
-	
+
 	};
 
 	std::vector<uint8_t> result;
@@ -280,10 +332,10 @@ std::vector<uint8_t> RyujinObfuscationCore::fix_branch_near_far_short(uint8_t or
 	const int64_t short_disp = static_cast<int64_t>(target_address) - (jmp_address + short_length);
 
 	if (short_disp >= -128 && short_disp <= 127) {
-		
+
 		result.push_back(original_opcode);
 		result.push_back(static_cast<uint8_t>(short_disp));
-		
+
 		return result;
 	}
 
@@ -292,7 +344,7 @@ std::vector<uint8_t> RyujinObfuscationCore::fix_branch_near_far_short(uint8_t or
 	if (it == SHORT_TO_NEAR.end()) {
 
 		result.push_back(original_opcode);
-		
+
 		return result; // Does not apply conversion
 	}
 
@@ -373,7 +425,7 @@ void RyujinObfuscationCore::applyRelocationFixupsToInstructions(uintptr_t imageB
 
 				std::printf("[OK] Fixing CALL IMM -> %s from 0x%X to 0x%X\n", instruction.instruction.text, immediateValue, new_immediate_reloc);
 
-			} 
+			}
 			//Fixing all Call to a memory(IAT) values from our obfuscated opcodes -> CALL [MEMORY]
 			else if (instruction.instruction.info.meta.category == ZYDIS_CATEGORY_CALL && instruction.instruction.operands->type == ZYDIS_OPERAND_TYPE_MEMORY && !m_config.m_isIatObfuscation) {
 
@@ -462,7 +514,7 @@ void RyujinObfuscationCore::applyRelocationFixupsToInstructions(uintptr_t imageB
 					*/
 					// Calculating the address of the instruction following the original instruction
 					const uintptr_t original_rip = original_address + instruction.instruction.info.length;
-					
+
 					// Calculating the original target address of the original instruction
 					const uintptr_t target_original = original_rip + memmory_immediate_offset;
 
@@ -481,7 +533,7 @@ void RyujinObfuscationCore::applyRelocationFixupsToInstructions(uintptr_t imageB
 
 			}
 			else if (instruction.instruction.info.meta.category == ZYDIS_CATEGORY_COND_BR || instruction.instruction.info.meta.category == ZYDIS_CATEGORY_UNCOND_BR) {
-			
+
 				// References for data and vector size with obfuscated opcodes
 				auto size = new_opcodes.size();
 				auto data = new_opcodes.data();
@@ -537,12 +589,12 @@ void RyujinObfuscationCore::applyRelocationFixupsToInstructions(uintptr_t imageB
 
 				// Clearing the branch so we can insert the new branch with the corrected opcode and its offset
 				std::memset(&*(data + offset), 0x90, 9); // Equivalent to -> branch + offset and possibly some add reg, value -> we have space because "addPaddingSpaces" into this section.
-				
+
 				// Patching the cleared region with the new branch, now fully fixed and with the newly calculated jump displacement
 				std::memcpy(&*(data + offset), corrected.data(), corrected.size());
 
 				std::printf("[OK] Fixing %s -> %X -> id: %X\n", instruction.instruction.text, instruction.instruction.operands[0].imm.value.u, block_id);
-				
+
 			}
 
 		}
@@ -576,7 +628,7 @@ void RyujinObfuscationCore::removeOldOpcodeRedirect(uintptr_t newMappedPE, std::
 		0xE9, 0, 0, 0, 0, //JMP imm
 	};
 
-	/*	
+	/*
 		Calculating the new displacement between the original code region and the target obfuscated opcode,
 		calculating the relative immediate offset.
 	*/

@@ -3,6 +3,8 @@
 #include <vector>
 #include <set>
 #include <cstdint>
+#include <random>
+#include <functional>
 #include <unordered_map>
 #include <asmjit/asmjit.h>
 #include <Zydis/Zydis.h>
