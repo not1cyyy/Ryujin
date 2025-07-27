@@ -3,10 +3,18 @@
 
 #define MAX_PROCEDURES 128
 #define MAX_PROCEDURE_NAME_LEN 128
+#define MAX_CALLBACKS 10
 
 struct RyujinObfuscatorProcs {
     int procedureCount;
     char procedures[MAX_PROCEDURES][MAX_PROCEDURE_NAME_LEN];
+};
+
+using RyujinCallback = void (*)(RyujinProcedure*);
+
+struct RyujinCallbacks {
+    int callbackCount;
+    RyujinCallback callbacks[MAX_CALLBACKS]; // Array de ponteiros de função
 };
 
 class RyuJinConfigInternal {
@@ -30,6 +38,6 @@ public:
     bool m_isAntiDump; // Enable Anti Dump technic for Ryujin protected binary
     bool m_isMemoryProtection; // Memory CRC32 protection
     RyujinObfuscatorProcs m_strProceduresToObfuscate; // Names of the procedures to obfuscate
-	// todo: passes
+    RyujinCallbacks m_callbacks; // Ryujin Custom Pass Callbacks
 
 };

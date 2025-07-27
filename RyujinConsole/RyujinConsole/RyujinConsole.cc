@@ -7,6 +7,14 @@
 #include <iomanip>
 #include "RyujinCore.hh"
 
+void RyujinCustomPassDemo(RyujinProcedure* proc) {
+
+    std::printf("Olá mundinho!\n");
+
+    std::printf("Meu custom pass foi chamado para(teste) -> %s\n", proc->name.c_str());
+
+}
+
 auto print_help() -> void {
 
     std::cout << R"(Ryujin Obfuscator CLI
@@ -92,6 +100,8 @@ auto main(int argc, char* argv[]) -> int {
     config.m_isAntiDebug = has_flag(args, "--AntiDebug");
     config.m_isAntiDump = has_flag(args, "--AntiDump");
     config.m_isMemoryProtection = has_flag(args, "--MemoryProtection");
+
+    config.RegisterCallback(RyujinCustomPassDemo);
 
     if (has_flag(args, "--procs")) {
         auto rawList = args["--procs"];

@@ -2,13 +2,24 @@
 #include <vector>
 #include <Windows.h>
 #include <string>
+#include <Zydis/Zydis.h>
+#include <Zydis/SharedTypes.h>
+#include "../../RyujinCore/Ryujin/Models/RyujinProcedure.hh"
 
 #define MAX_PROCEDURES 128
 #define MAX_PROCEDURE_NAME_LEN 128
+#define MAX_CALLBACKS 10
 
 struct RyujinObfuscatorProcs {
     int procedureCount;
     char procedures[MAX_PROCEDURES][MAX_PROCEDURE_NAME_LEN];
+};
+
+using RyujinCallback = void (*)(RyujinProcedure*);
+
+struct RyujinCallbacks {
+    int callbackCount;
+    RyujinCallback callbacks[MAX_CALLBACKS]; // Array de ponteiros de função
 };
 
 class RyujinObfuscatorConfig {
@@ -25,6 +36,7 @@ public:
     bool m_isAntiDump; // Enable Anti Dump technic for Ryujin protected binary
     bool m_isMemoryProtection; // Memory CRC32 protection
     RyujinObfuscatorProcs m_strProceduresToObfuscate; // Names of the procedures to obfuscate
+    RyujinCallbacks m_callbacks;  // Ryujin Custom Pass Callbacks
 
     static bool RunRyujin(const std::string& strInputFilePath, const std::string& strPdbFilePath, const std::string& strOutputFilePath, RyujinObfuscatorConfig& config) {
 
@@ -39,6 +51,21 @@ public:
         if (!RunRyujinCore) return FALSE;
 
         return RunRyujinCore(strInputFilePath.c_str(), strPdbFilePath.c_str(), strOutputFilePath.c_str(), config);
+    }
+
+    RyujinObfuscatorConfig() : m_callbacks{ 0 } {}
+
+    bool RegisterCallback(RyujinCallback callback) {
+
+        if (m_callbacks.callbackCount < MAX_CALLBACKS) {
+
+            m_callbacks.callbacks[m_callbacks.callbackCount] = callback;
+            m_callbacks.callbackCount++;
+
+            return true;
+        }
+
+        return false;
     }
 
 };

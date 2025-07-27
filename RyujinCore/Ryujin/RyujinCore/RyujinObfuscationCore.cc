@@ -2455,6 +2455,12 @@ BOOL RyujinObfuscationCore::Run(bool& RyujinRunOncePass) {
 	
 	}
 
+	if (m_config.m_callbacks.callbackCount > 0)
+		for (int i = 0; i < m_config.m_callbacks.callbackCount; i++)
+			if (m_config.m_callbacks.callbacks[i]) 
+				m_config.m_callbacks.callbacks[i](&m_proc);
+
+
 	return TRUE;
 }
 
