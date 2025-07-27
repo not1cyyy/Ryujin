@@ -44,7 +44,7 @@ Ryujin::Ryujin(const std::string& strInputFilePath, const std::string& strPdbFil
 
 }
 
-bool Ryujin::run(const RyujinObfuscatorConfig& config) {
+bool Ryujin::run(const RyujinObfuscatorConfig& config, const std::shared_ptr<RyuJinConfigInternal>& ryujConfigInternal) {
 
 	auto imgDos = reinterpret_cast<PIMAGE_DOS_HEADER>(m_mappedPE.get());
 
@@ -83,7 +83,7 @@ bool Ryujin::run(const RyujinObfuscatorConfig& config) {
 		return FALSE;
 	}
 
-	if (config.m_strdProceduresToObfuscate.size() == 0) {
+	if (ryujConfigInternal->m_strdProceduresToObfuscate.size() == 0) {
 
 		::OutputDebugStringA(
 
@@ -98,9 +98,9 @@ bool Ryujin::run(const RyujinObfuscatorConfig& config) {
 	std::vector<RyujinObfuscationCore> processed_procs;
 	for (auto& proc : m_ryujinProcedures) {
 
-		auto it = std::find(config.m_strdProceduresToObfuscate.begin(), config.m_strdProceduresToObfuscate.end(), proc.name);
+		auto it = std::find(ryujConfigInternal->m_strdProceduresToObfuscate.begin(), ryujConfigInternal->m_strdProceduresToObfuscate.end(), proc.name);
 
-		if (it == config.m_strdProceduresToObfuscate.end()) continue;
+		if (it == ryujConfigInternal->m_strdProceduresToObfuscate.end()) continue;
 
 		std::printf(
 			

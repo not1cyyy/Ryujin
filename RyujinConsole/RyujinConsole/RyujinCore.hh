@@ -25,7 +25,6 @@ public:
     bool m_isAntiDump; // Enable Anti Dump technic for Ryujin protected binary
     bool m_isMemoryProtection; // Memory CRC32 protection
     RyujinObfuscatorProcs m_strProceduresToObfuscate; // Names of the procedures to obfuscate
-    std::vector<std::string> m_strdProceduresToObfuscate; // Names of the procedures to obfuscate
 
     static bool RunRyujin(const std::string& strInputFilePath, const std::string& strPdbFilePath, const std::string& strOutputFilePath, RyujinObfuscatorConfig& config) {
 

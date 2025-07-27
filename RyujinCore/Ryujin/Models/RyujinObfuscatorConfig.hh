@@ -9,6 +9,13 @@ struct RyujinObfuscatorProcs {
     char procedures[MAX_PROCEDURES][MAX_PROCEDURE_NAME_LEN];
 };
 
+class RyuJinConfigInternal {
+
+public:
+    std::vector<std::string> m_strdProceduresToObfuscate; // Names of the procedures to obfuscate
+
+};
+
 class RyujinObfuscatorConfig {
 
 public:
@@ -22,8 +29,7 @@ public:
     bool m_isTrollRerversers; // The user wants to trick and use a special feature to troll reversers when their debugs be detected making they loose all the progress
     bool m_isAntiDump; // Enable Anti Dump technic for Ryujin protected binary
     bool m_isMemoryProtection; // Memory CRC32 protection
-    RyujinObfuscatorProcs m_strProceduresToObfuscate; // Names of the procedures to obfuscate - FFI
-    std::vector<std::string> m_strdProceduresToObfuscate; // Names of the procedures to obfuscate
+    RyujinObfuscatorProcs m_strProceduresToObfuscate; // Names of the procedures to obfuscate
 	// todo: passes
 
 };
