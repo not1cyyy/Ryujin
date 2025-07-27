@@ -48,6 +48,43 @@ For both options, you will need exclusively a PE file (Apanas, executable, for n
 
 ---
 
+## Custom Pass Support
+
+In addition to the standard techniques available via CLI or GUI options, Ryūjin also supports a Custom Pass feature. This allows anyone to implement a callback that is invoked during the obfuscation flow, enabling users to extend Ryūjin’s capabilities with custom features specific to their code.
+
+To do this, the user must follow a specific callback model:
+
+```c++
+void RyujinCustomPassDemo(RyujinProcedure* proc);
+```
+
+Each time the callback is invoked, a ```RyujinProcedure``` instance is provided, allowing the user to modify execution scopes, basic block structures, and more. The class definition can be found in [RyujinProcedure.hh](https://github.com/keowu/Ryujin/blob/main/RyujinCore/Ryujin/Models/RyujinProcedure.hh). Additionally, a usage example is available in [RyujinConsole.cc](https://github.com/keowu/Ryujin/blob/main/RyujinConsole/RyujinConsole/RyujinConsole.cc#L10), No additional configuration file changes are required. The ```RyujinObfuscatorConfig``` class already includes all necessary settings for immediate use.
+
+## Dependencies
+
+To compile RyujinCore, RyujinConsole, and RyujinGUI, critical dependencies must be installed via [Microsoft VCPKG](https://github.com/microsoft/vcpkg), You can install them using the following commands:
+
+```
+vcpkg install asmjit
+vcpkg install zydis
+```
+
+For a consistent development environment, consider the following versions:
+
+```
+asmjit:x64-windows - 2024-06-28
+zycore:x64-windows - 1.5.0
+zydis:x64-windows - 4.1.0
+```
+
+In addition to these critical dependencies, some optional ones exist, for example, ```wxWidgets```, which is required to build RyujinGUI. It can be obtained from the [wxWidgets website](https://wxwidgets.org/downloads/).
+
+## Research Paper
+
+If you enjoy understanding how things work technically and exploring deep concepts, consider reading the **Ryūjin paper**:
+
+**TODO**
+
 ## Getting Started
 
-GITHUB_WIKI_URL
+For more detailed usage information and explanations of each feature intended for daily use, consider reading the [**Ryūjin Wiki**](https://github.com/keowu/Ryujin/wiki).

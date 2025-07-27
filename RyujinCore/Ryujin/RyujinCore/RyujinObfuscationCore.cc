@@ -2439,6 +2439,21 @@ BOOL RyujinObfuscationCore::Run(bool& RyujinRunOncePass) {
 
 	}
 
+	// Checking if we have any user-registered callbacks
+	if (m_config.m_callbacks.callbackCount > 0)
+		// Iterating over each registered callback
+		for (auto i = 0; i < m_config.m_callbacks.callbackCount; i++)
+			// If it's a valid address
+			if (m_config.m_callbacks.callbacks[i]) {
+
+				// We invoke the callback, passing the m_proc instance by reference to allow user modifications.
+				m_config.m_callbacks.callbacks[i](&m_proc);
+
+				// We update the Basic Blocks context to stay 1:1 with the user's modifications.
+				this->updateBasicBlocksContext();
+
+			}
+
 	if (RyujinRunOncePass) {
 	
 		if (this->m_config.m_isMemoryProtection && (!this->m_config.m_isAntiDump || !this->m_config.m_isEncryptObfuscatedCode || !this->m_config.m_isRandomSection)) {
@@ -2454,11 +2469,6 @@ BOOL RyujinObfuscationCore::Run(bool& RyujinRunOncePass) {
 		RyujinRunOncePass = FALSE;
 	
 	}
-
-	if (m_config.m_callbacks.callbackCount > 0)
-		for (int i = 0; i < m_config.m_callbacks.callbackCount; i++)
-			if (m_config.m_callbacks.callbacks[i]) 
-				m_config.m_callbacks.callbacks[i](&m_proc);
 
 
 	return TRUE;

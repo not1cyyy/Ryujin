@@ -9,9 +9,40 @@
 
 void RyujinCustomPassDemo(RyujinProcedure* proc) {
 
-    std::printf("Olá mundinho!\n");
+    /*
+            This is a sample callback that demonstrates how Ryujin users can register callbacks during its operation/integration to be used with the RyujinCore engine.
+            This callback provides direct access to the RyujinProcedure class, which encapsulates all the logic of basic blocks and information about each obfuscated procedure,
+            allowing modifications and extensions limited only by the implementer's creativity.
+            In this example, the registered callback is used solely to display relevant information about each procedure to be obfuscated, as a demonstration.
 
-    std::printf("Meu custom pass foi chamado para(teste) -> %s\n", proc->name.c_str());
+            A sample output:
+            ----------------------------------------------
+            RyujinCustomPassDemo get called for subadd
+            subadd has 31 bytes, resides on 0x7ff6c7fd1100, with 1 basic blocks.
+            Instructions:
+            mov [rsp+0x08], ecx
+            mov eax, [rsp+0x08]
+            add eax, 0x0A
+            mov [rsp+0x08], eax
+            mov eax, [rsp+0x08]
+            sub eax, 0x02
+            mov [rsp+0x08], eax
+            mov eax, [rsp+0x08]
+            ret
+            ----------------------------------------------
+    */
+
+    std::printf("----------------------------------------------\n");
+    std::printf("RyujinCustomPassDemo get called for %s\n", proc->name.c_str());
+    std::printf("%s has %lld bytes, resides on 0x%llx, with %llx basic blocks.\n", proc->name.c_str(), proc->size, proc->address, proc->basic_blocks.size());
+
+    std::printf("Instructions:\n");
+
+    for (auto& block : proc->basic_blocks)
+        for (auto& inst : block.instructions)
+            std::printf("%s\n", inst.instruction.text);
+
+    std::printf("----------------------------------------------\n");
 
 }
 
@@ -101,6 +132,7 @@ auto main(int argc, char* argv[]) -> int {
     config.m_isAntiDump = has_flag(args, "--AntiDump");
     config.m_isMemoryProtection = has_flag(args, "--MemoryProtection");
 
+    // Registering a new custom pass for invocation via callback
     config.RegisterCallback(RyujinCustomPassDemo);
 
     if (has_flag(args, "--procs")) {
