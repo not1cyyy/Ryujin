@@ -232,6 +232,520 @@ bool Ryujin::run(const RyujinObfuscatorConfig& config, const std::shared_ptr<Ryu
 
 			const unsigned char stubMiniVMHV[] = {
 
+				/*
+				#pragma optimize("", off)
+				__declspec(noinline) __declspec(safebuffers) UINT64 RyujinHVtest(uint64_t rcx_arg, uint64_t rdx_arg) {
+    
+					    wchar_t kernel32_name_stack[13]{ 0 };
+					    kernel32_name_stack[0] = L'k'; kernel32_name_stack[1] = L'e'; kernel32_name_stack[2] = L'r'; kernel32_name_stack[3] = L'n';
+					    kernel32_name_stack[4] = L'e'; kernel32_name_stack[5] = L'l'; kernel32_name_stack[6] = L'3'; kernel32_name_stack[7] = L'2';
+					    kernel32_name_stack[8] = L'.'; kernel32_name_stack[9] = L'd'; kernel32_name_stack[10] = L'l'; kernel32_name_stack[11] = L'l';
+					    kernel32_name_stack[12] = 0;
+					
+					    wchar_t winhv_name_stack[18]{ 0 };
+					    winhv_name_stack[0] = L'W'; winhv_name_stack[1] = L'i'; winhv_name_stack[2] = L'n'; winhv_name_stack[3] = L'H';
+					    winhv_name_stack[4] = L'v'; winhv_name_stack[5] = L'P'; winhv_name_stack[6] = L'l'; winhv_name_stack[7] = L'a';
+					    winhv_name_stack[8] = L't'; winhv_name_stack[9] = L'f'; winhv_name_stack[10] = L'o'; winhv_name_stack[11] = L'r';
+					    winhv_name_stack[12] = L'm'; winhv_name_stack[13] = L'.'; winhv_name_stack[14] = L'd'; winhv_name_stack[15] = L'l';
+					    winhv_name_stack[16] = L'l'; winhv_name_stack[17] = 0;
+					
+					    wchar_t ntdll_name_stack[10]{ 0 };
+					    ntdll_name_stack[0] = L'n'; ntdll_name_stack[1] = L't'; ntdll_name_stack[2] = L'd'; ntdll_name_stack[3] = L'l';
+					    ntdll_name_stack[4] = L'l'; ntdll_name_stack[5] = L'.'; ntdll_name_stack[6] = L'd'; ntdll_name_stack[7] = L'l';
+					    ntdll_name_stack[8] = L'l'; ntdll_name_stack[9] = 0;
+					
+					    char s_VirtualAlloc[13]{ 0 };
+					    s_VirtualAlloc[0] = 'V'; s_VirtualAlloc[1] = 'i'; s_VirtualAlloc[2] = 'r'; s_VirtualAlloc[3] = 't'; s_VirtualAlloc[4] = 'u';
+					    s_VirtualAlloc[5] = 'a'; s_VirtualAlloc[6] = 'l'; s_VirtualAlloc[7] = 'A'; s_VirtualAlloc[8] = 'l'; s_VirtualAlloc[9] = 'l';
+					    s_VirtualAlloc[10] = 'o'; s_VirtualAlloc[11] = 'c'; s_VirtualAlloc[12] = 0;
+					
+					    char s_VirtualFree[12]{ 0 };
+					    s_VirtualFree[0] = 'V'; s_VirtualFree[1] = 'i'; s_VirtualFree[2] = 'r'; s_VirtualFree[3] = 't'; s_VirtualFree[4] = 'u';
+					    s_VirtualFree[5] = 'a'; s_VirtualFree[6] = 'l'; s_VirtualFree[7] = 'F'; s_VirtualFree[8] = 'r'; s_VirtualFree[9] = 'e';
+					    s_VirtualFree[10] = 'e'; s_VirtualFree[11] = 0;
+					
+					    char s_LdrLoadDll[11]{ 0 };
+					    s_LdrLoadDll[0] = 'L'; s_LdrLoadDll[1] = 'd'; s_LdrLoadDll[2] = 'r'; s_LdrLoadDll[3] = 'L'; s_LdrLoadDll[4] = 'o';
+					    s_LdrLoadDll[5] = 'a'; s_LdrLoadDll[6] = 'd'; s_LdrLoadDll[7] = 'D'; s_LdrLoadDll[8] = 'l'; s_LdrLoadDll[9] = 'l';
+					    s_LdrLoadDll[10] = 0;
+					
+					    // WHVS Apis
+					    char s_WHvGetCapability[17] = { 'W','H','v','G','e','t','C','a','p','a','b','i','l','i','t','y',0 };
+					    char s_WHvCreatePartition[23] = { 'W','H','v','C','r','e','a','t','e','P','a','r','t','i','t','i','o','n',0 };
+					    char s_WHvSetPartitionProperty[36] = { 'W','H','v','S','e','t','P','a','r','t','i','t','i','o','n','P','r','o','p','e','r','t','y',0 };
+					    char s_WHvSetupPartition[22] = { 'W','H','v','S','e','t','u','p','P','a','r','t','i','t','i','o','n',0 };
+					    char s_WHvMapGpaRange[15] = { 'W','H','v','M','a','p','G','p','a','R','a','n','g','e',0 };
+					    char s_WHvCreateVirtualProcessor[32] = { 'W','H','v','C','r','e','a','t','e','V','i','r','t','u','a','l','P','r','o','c','e','s','s','o','r',0 };
+					    char s_WHvSetVirtualProcessorRegisters[48] = { 'W','H','v','S','e','t','V','i','r','t','u','a','l','P','r','o','c','e','s','s','o','r','R','e','g','i','s','t','e','r','s',0 };
+					    char s_WHvGetVirtualProcessorRegisters[48] = { 'W','H','v','G','e','t','V','i','r','t','u','a','l','P','r','o','c','e','s','s','o','r','R','e','g','i','s','t','e','r','s',0 };
+					    char s_WHvDeleteVirtualProcessor[34] = { 'W','H','v','D','e','l','e','t','e','V','i','r','t','u','a','l','P','r','o','c','e','s','s','o','r',0 };
+					    char s_WHvUnmapGpaRange[18] = { 'W','H','v','U','n','m','a','p','G','p','a','R','a','n','g','e',0 };
+					    char s_WHvDeletePartition[25] = { 'W','H','v','D','e','l','e','t','e','P','a','r','t','i','t','i','o','n',0 };
+					    char s_WHvRunVirtualProcessor[32] = { 'W','H','v','R','u','n','V','i','r','t','u','a','l','P','r','o','c','e','s','s','o','r',0 };
+					
+					    // MiniVM Stub
+					    unsigned char raw[239]{ 0 };
+					    raw[0] = 0x48; raw[1] = 0xBA; raw[2] = 0x78; raw[3] = 0x56; raw[4] = 0x34; raw[5] = 0x12; raw[6] = 0x78; raw[7] = 0x56; raw[8] = 0x34; raw[9] = 0x12;
+					    raw[10] = 0x48; raw[11] = 0xB9; raw[12] = 0x78; raw[13] = 0x56; raw[14] = 0x34; raw[15] = 0x12; raw[16] = 0x78; raw[17] = 0x56; raw[18] = 0x34; raw[19] = 0x12;
+					    raw[20] = 0xEB; raw[21] = 0x00; raw[22] = 0x48; raw[23] = 0x89; raw[24] = 0x54; raw[25] = 0x24; raw[26] = 0x10; raw[27] = 0x48; raw[28] = 0x89; raw[29] = 0x4C;
+					    raw[30] = 0x24; raw[31] = 0x08; raw[32] = 0x48; raw[33] = 0x83; raw[34] = 0xEC; raw[35] = 0x28; raw[36] = 0x48; raw[37] = 0x8B; raw[38] = 0x44; raw[39] = 0x24;
+					    raw[40] = 0x38; raw[41] = 0x48; raw[42] = 0xC1; raw[43] = 0xE8; raw[44] = 0x10; raw[45] = 0x48; raw[46] = 0x25; raw[47] = 0xFF; raw[48] = 0x00; raw[49] = 0x00;
+					    raw[50] = 0x00; raw[51] = 0x88; raw[52] = 0x44; raw[53] = 0x24; raw[54] = 0x01; raw[55] = 0x48; raw[56] = 0x8B; raw[57] = 0x44; raw[58] = 0x24; raw[59] = 0x38;
+					    raw[60] = 0x48; raw[61] = 0xC1; raw[62] = 0xE8; raw[63] = 0x08; raw[64] = 0x48; raw[65] = 0x25; raw[66] = 0xFF; raw[67] = 0x00; raw[68] = 0x00; raw[69] = 0x00;
+					    raw[70] = 0x88; raw[71] = 0x04; raw[72] = 0x24; raw[73] = 0x48; raw[74] = 0x8B; raw[75] = 0x44; raw[76] = 0x24; raw[77] = 0x38; raw[78] = 0x48; raw[79] = 0x25;
+					    raw[80] = 0xFF; raw[81] = 0x00; raw[82] = 0x00; raw[83] = 0x00; raw[84] = 0x48; raw[85] = 0x89; raw[86] = 0x44; raw[87] = 0x24; raw[88] = 0x10; raw[89] = 0x48;
+					    raw[90] = 0x8B; raw[91] = 0x44; raw[92] = 0x24; raw[93] = 0x30; raw[94] = 0x48; raw[95] = 0x89; raw[96] = 0x44; raw[97] = 0x24; raw[98] = 0x08; raw[99] = 0x0F;
+					    raw[100] = 0xB6; raw[101] = 0x04; raw[102] = 0x24; raw[103] = 0x88; raw[104] = 0x44; raw[105] = 0x24; raw[106] = 0x04; raw[107] = 0x80; raw[108] = 0x7C; raw[109] = 0x24;
+					    raw[110] = 0x04; raw[111] = 0x01; raw[112] = 0x74; raw[113] = 0x17; raw[114] = 0x80; raw[115] = 0x7C; raw[116] = 0x24; raw[117] = 0x04; raw[118] = 0x02; raw[119] = 0x74;
+					    raw[120] = 0x27; raw[121] = 0x80; raw[122] = 0x7C; raw[123] = 0x24; raw[124] = 0x04; raw[125] = 0x03; raw[126] = 0x74; raw[127] = 0x37; raw[128] = 0x80; raw[129] = 0x7C;
+					    raw[130] = 0x24; raw[131] = 0x04; raw[132] = 0x04; raw[133] = 0x74; raw[134] = 0x42; raw[135] = 0xEB; raw[136] = 0x53; raw[137] = 0x48; raw[138] = 0x8B; raw[139] = 0x44;
+					    raw[140] = 0x24; raw[141] = 0x10; raw[142] = 0x48; raw[143] = 0x8B; raw[144] = 0x4C; raw[145] = 0x24; raw[146] = 0x08; raw[147] = 0x48; raw[148] = 0x03; raw[149] = 0xC8;
+					    raw[150] = 0x48; raw[151] = 0x8B; raw[152] = 0xC1; raw[153] = 0x48; raw[154] = 0x89; raw[155] = 0x44; raw[156] = 0x24; raw[157] = 0x08; raw[158] = 0xEB; raw[159] = 0x45;
+					    raw[160] = 0x48; raw[161] = 0x8B; raw[162] = 0x44; raw[163] = 0x24; raw[164] = 0x10; raw[165] = 0x48; raw[166] = 0x8B; raw[167] = 0x4C; raw[168] = 0x24; raw[169] = 0x08;
+					    raw[170] = 0x48; raw[171] = 0x2B; raw[172] = 0xC8; raw[173] = 0x48; raw[174] = 0x8B; raw[175] = 0xC1; raw[176] = 0x48; raw[177] = 0x89; raw[178] = 0x44; raw[179] = 0x24;
+					    raw[180] = 0x08; raw[181] = 0xEB; raw[182] = 0x2E; raw[183] = 0x48; raw[184] = 0x8B; raw[185] = 0x44; raw[186] = 0x24; raw[187] = 0x08; raw[188] = 0x48; raw[189] = 0x0F;
+					    raw[190] = 0xAF; raw[191] = 0x44; raw[192] = 0x24; raw[193] = 0x10; raw[194] = 0x48; raw[195] = 0x89; raw[196] = 0x44; raw[197] = 0x24; raw[198] = 0x08; raw[199] = 0xEB;
+					    raw[200] = 0x1C; raw[201] = 0x33; raw[202] = 0xD2; raw[203] = 0x48; raw[204] = 0x8B; raw[205] = 0x44; raw[206] = 0x24; raw[207] = 0x08; raw[208] = 0x48; raw[209] = 0xF7;
+					    raw[210] = 0x74; raw[211] = 0x24; raw[212] = 0x10; raw[213] = 0x48; raw[214] = 0x89; raw[215] = 0x44; raw[216] = 0x24; raw[217] = 0x08; raw[218] = 0xEB; raw[219] = 0x09;
+					    raw[220] = 0x48; raw[221] = 0xC7; raw[222] = 0x44; raw[223] = 0x24; raw[224] = 0x08; raw[225] = 0x00; raw[226] = 0x00; raw[227] = 0x00; raw[228] = 0x00; raw[229] = 0x48;
+					    raw[230] = 0x8B; raw[231] = 0x44; raw[232] = 0x24; raw[233] = 0x08; raw[234] = 0x48; raw[235] = 0x83; raw[236] = 0xC4; raw[237] = 0x28; raw[238] = 0xC3;
+					
+					    // Looking kernel32 in PEB
+					#ifdef _M_X64
+					    PEB_LOCAL* peb = (PEB_LOCAL*)__readgsqword(PEB_OFFSET_LOCAL);
+					#else
+					    PEB_LOCAL* peb = (PEB_LOCAL*)__readfsdword(PEB_OFFSET_LOCAL);
+					#endif
+					    if (!peb || !peb->Ldr) return (UINT64)-20;
+					
+					    auto* head = &peb->Ldr->InLoadOrderModuleList;
+					    auto* cur = head->Flink;
+					    uintptr_t k32_base = NULL;
+					    while (cur != head) {
+					
+					        auto* entry = CONTAINING_RECORD_LOCAL(cur, LDR_DATA_TABLE_ENTRY_LOCAL, InLoadOrderLinks);
+					        
+					        if (entry && entry->BaseDllName.Buffer) {
+					        
+					            const auto* a = entry->BaseDllName.Buffer;
+					            const auto* b = kernel32_name_stack;
+					            int eq = 1;
+					            while (*a && *b) {
+					
+					                auto ca = (*a >= L'A' && *a <= L'Z') ? static_cast<wchar_t>(*a + 0x20) : *a;
+					                auto cb = (*b >= L'A' && *b <= L'Z') ? static_cast<wchar_t>(*b + 0x20) : *b;
+					                if (ca != cb) { eq = 0; break; }
+					                ++a; ++b;
+					            
+					            }
+					            if (eq && (*a == 0 && *b == 0)) {
+					            
+					                k32_base = reinterpret_cast<uintptr_t>(entry->DllBase);
+					                
+					                break;
+					            }
+					        
+					        }
+					
+					        cur = cur->Flink;
+					    
+					    }
+					    if (!k32_base) return static_cast<UINT64>(-21);
+					
+					    // Solving VirtualAlloc/VirtualFree from export table
+					    auto* dos_k = reinterpret_cast<IMAGE_DOS_HEADER*>(k32_base);
+					    if (dos_k->e_magic != IMAGE_DOS_SIGNATURE) return static_cast<UINT64>(-22);
+					    auto* nt_k = reinterpret_cast<IMAGE_NT_HEADERS*>(k32_base + dos_k->e_lfanew);
+					    if (nt_k->Signature != IMAGE_NT_SIGNATURE) return static_cast<UINT64>(-23);
+					    auto ed_k = nt_k->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT];
+					    if (!ed_k.VirtualAddress || !ed_k.Size) return static_cast<UINT64>(-24);
+					    auto* exp_k = reinterpret_cast<IMAGE_EXPORT_DIRECTORY*>(k32_base + ed_k.VirtualAddress);
+					    auto* names_k = reinterpret_cast<DWORD*>(k32_base + exp_k->AddressOfNames);
+					    auto* ords_k = reinterpret_cast<WORD*>(k32_base + exp_k->AddressOfNameOrdinals);
+					    auto* funcs_k = reinterpret_cast<DWORD*>(k32_base + exp_k->AddressOfFunctions);
+					    if (!names_k || !ords_k || !funcs_k) return static_cast<UINT64>(-25);
+					
+					    void* pVirtualAlloc = NULL;
+					    void* pVirtualFree = NULL;
+					    for (auto i = 0; i < exp_k->NumberOfNames; ++i) {
+					
+					        auto name = reinterpret_cast<const char*>(k32_base + names_k[i]);
+					        { auto a = name; auto b = s_VirtualAlloc; int eq = 1; while (*a || *b) { if (*a != *b) { eq = 0; break; } ++a; ++b; } if (eq) pVirtualAlloc = reinterpret_cast<void*>(k32_base + funcs_k[ords_k[i]]); }
+					        { auto a = name; auto b = s_VirtualFree; int eq = 1; while (*a || *b) { if (*a != *b) { eq = 0; break; } ++a; ++b; } if (eq) pVirtualFree = reinterpret_cast<void*>(k32_base + funcs_k[ords_k[i]]); }
+					        if (pVirtualAlloc && pVirtualFree) break;
+					    
+					    }
+					    
+					    if (!pVirtualAlloc || !pVirtualFree) return static_cast<UINT64>(-26);
+					
+					    auto fnVirtualAlloc = reinterpret_cast<VirtualAlloc_t>(pVirtualAlloc);
+					    auto fnVirtualFree = reinterpret_cast<VirtualFree_t>(pVirtualFree);
+					
+					    //Looking NTDLL base
+					    uintptr_t ntdll_base = NULL;
+					    cur = head->Flink;
+					    while (cur != head) {
+					        
+					        auto entry = CONTAINING_RECORD_LOCAL(cur, LDR_DATA_TABLE_ENTRY_LOCAL, InLoadOrderLinks);
+					        if (entry && entry->BaseDllName.Buffer) {
+					        
+					            auto* a = entry->BaseDllName.Buffer;
+					            auto* b = ntdll_name_stack;
+					            int eq = 1;
+					            while (*a && *b) {
+					            
+					                auto ca = (*a >= L'A' && *a <= L'Z') ? static_cast<wchar_t>(*a + 0x20) : *a;
+					                auto cb = (*b >= L'A' && *b <= L'Z') ? static_cast<wchar_t>(*b + 0x20) : *b;
+					                if (ca != cb) { eq = 0; break; }
+					                ++a; ++b;
+					            
+					            }
+					            if (eq && (*a == 0 && *b == 0)) {
+					
+					                ntdll_base = reinterpret_cast<uintptr_t>(entry->DllBase);
+					                
+					                break;
+					            }
+					
+					        }
+					
+					        cur = cur->Flink;
+					    }
+					    if (!ntdll_base) return static_cast<UINT64>(-27);
+					
+					    // LdrLoadDll
+					    auto dos_n = reinterpret_cast<IMAGE_DOS_HEADER*>(ntdll_base);
+					    if (dos_n->e_magic != IMAGE_DOS_SIGNATURE) return static_cast<UINT64>(-28);
+					    auto nt_n = reinterpret_cast<IMAGE_NT_HEADERS*>(ntdll_base + dos_n->e_lfanew);
+					    if (nt_n->Signature != IMAGE_NT_SIGNATURE) return static_cast<UINT64>(-29);
+					    auto ed_n = nt_n->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT];
+					    if (!ed_n.VirtualAddress || !ed_n.Size) return static_cast<UINT64>(-30);
+					    auto exp_n = reinterpret_cast<IMAGE_EXPORT_DIRECTORY*>(ntdll_base + ed_n.VirtualAddress);
+					    auto names_n = reinterpret_cast<DWORD*>(ntdll_base + exp_n->AddressOfNames);
+					    auto ords_n = reinterpret_cast<WORD*>(ntdll_base + exp_n->AddressOfNameOrdinals);
+					    auto funcs_n = reinterpret_cast<DWORD*>(ntdll_base + exp_n->AddressOfFunctions);
+					    if (!names_n || !ords_n || !funcs_n) return static_cast<UINT64>(-31);
+					
+					    void* pLdrLoadDll = NULL;
+					    for (auto i = 0; i < exp_n->NumberOfNames; ++i) {
+					
+					        auto name = reinterpret_cast<const char*>(ntdll_base + names_n[i]);
+					        auto a = name; auto b = s_LdrLoadDll; int eq = 1;
+					        while (*a || *b) { if (*a != *b) { eq = 0; break; } ++a; ++b; }
+					        if (eq) { pLdrLoadDll = reinterpret_cast<void*>(ntdll_base + funcs_n[ords_n[i]]); break; }
+					    
+					    }
+					    if (!pLdrLoadDll) return static_cast<UINT64>(-32);
+					
+					    auto fnLdrLoadDll = reinterpret_cast<LdrLoadDll_t>(pLdrLoadDll);
+					
+					    UNICODE_STRING_LOCAL uName;
+					    USHORT wlen = 0;
+					    while (winhv_name_stack[wlen]) ++wlen;
+					    uName.Length = static_cast<USHORT>(wlen * sizeof(wchar_t));
+					    uName.MaximumLength = static_cast<USHORT>(uName.Length + sizeof(wchar_t));
+					    uName.Buffer = static_cast<PWSTR>(winhv_name_stack);
+					
+					    // Hackfix: For stack space
+					    volatile unsigned char stack_space[256]{ 0 };
+					    stack_space[0] = (unsigned char)stack_space[0];
+					    stack_space[255] = (unsigned char)stack_space[255];
+					
+					    HANDLE hWinHvHandle = NULL;
+					    auto st = fnLdrLoadDll(NULL, 0, reinterpret_cast<UNICODE_STRING*>(&uName), &hWinHvHandle);
+					    if (st < 0 || hWinHvHandle == NULL)
+					        return static_cast<UINT64>(-33);
+					    
+					    uintptr_t winhv_base = reinterpret_cast<uintptr_t>(hWinHvHandle);
+					
+					    // Looking for WinHv exports
+					    auto dos_w = reinterpret_cast<IMAGE_DOS_HEADER*>(winhv_base);
+					    if (dos_w->e_magic != IMAGE_DOS_SIGNATURE) return static_cast<UINT64>(-34);
+					    auto nt_w = reinterpret_cast<IMAGE_NT_HEADERS*>(winhv_base + dos_w->e_lfanew);
+					    if (nt_w->Signature != IMAGE_NT_SIGNATURE) return static_cast<UINT64>(-35);
+					    auto ed_w = nt_w->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT];
+					    if (!ed_w.VirtualAddress || !ed_w.Size) return static_cast<UINT64>(-36);
+					    auto exp_w = reinterpret_cast<IMAGE_EXPORT_DIRECTORY*>(winhv_base + ed_w.VirtualAddress);
+					    auto names_w = reinterpret_cast<DWORD*>(winhv_base + exp_w->AddressOfNames);
+					    auto ords_w = reinterpret_cast<WORD*>(winhv_base + exp_w->AddressOfNameOrdinals);
+					    auto funcs_w = reinterpret_cast<DWORD*>(winhv_base + exp_w->AddressOfFunctions);
+					    if (!names_w || !ords_w || !funcs_w) return static_cast<UINT64>(-37);
+					
+					    void* pWHvGetCapability = NULL;
+					    void* pWHvCreatePartition = NULL;
+					    void* pWHvSetPartitionProperty = NULL;
+					    void* pWHvSetupPartition = NULL;
+					    void* pWHvMapGpaRange = NULL;
+					    void* pWHvCreateVirtualProcessor = NULL;
+					    void* pWHvSetVirtualProcessorRegisters = NULL;
+					    void* pWHvGetVirtualProcessorRegisters = NULL;
+					    void* pWHvDeleteVirtualProcessor = NULL;
+					    void* pWHvUnmapGpaRange = NULL;
+					    void* pWHvDeletePartition = NULL;
+					    void* pWHvRunVirtualProcessor = NULL;
+					
+					    for (auto i = 0; i < exp_w->NumberOfNames; ++i) {
+					        
+					        auto name = reinterpret_cast<const char*>(winhv_base + names_w[i]);
+					
+					        { auto a = name; auto b = s_WHvGetCapability; int eq = 1; while (*a || *b) { if (*a != *b) { eq = 0; break; }++a; ++b; } if (eq) pWHvGetCapability = reinterpret_cast<void*>(winhv_base + funcs_w[ords_w[i]]); }
+					        { auto a = name; auto b = s_WHvCreatePartition; int eq = 1; while (*a || *b) { if (*a != *b) { eq = 0; break; }++a; ++b; } if (eq) pWHvCreatePartition = reinterpret_cast<void*>(winhv_base + funcs_w[ords_w[i]]); }
+					        { auto a = name; auto b = s_WHvSetPartitionProperty; int eq = 1; while (*a || *b) { if (*a != *b) { eq = 0; break; }++a; ++b; } if (eq) pWHvSetPartitionProperty = reinterpret_cast<void*>(winhv_base + funcs_w[ords_w[i]]); }
+					        { auto a = name; auto b = s_WHvSetupPartition; int eq = 1; while (*a || *b) { if (*a != *b) { eq = 0; break; }++a; ++b; } if (eq) pWHvSetupPartition = reinterpret_cast<void*>(winhv_base + funcs_w[ords_w[i]]); }
+					        { auto a = name; auto b = s_WHvMapGpaRange; int eq = 1; while (*a || *b) { if (*a != *b) { eq = 0; break; }++a; ++b; } if (eq) pWHvMapGpaRange = reinterpret_cast<void*>(winhv_base + funcs_w[ords_w[i]]); }
+					        { auto a = name; auto b = s_WHvCreateVirtualProcessor; int eq = 1; while (*a || *b) { if (*a != *b) { eq = 0; break; }++a; ++b; } if (eq) pWHvCreateVirtualProcessor = reinterpret_cast<void*>(winhv_base + funcs_w[ords_w[i]]); }
+					        { auto a = name; auto b = s_WHvSetVirtualProcessorRegisters; int eq = 1; while (*a || *b) { if (*a != *b) { eq = 0; break; }++a; ++b; } if (eq) pWHvSetVirtualProcessorRegisters = reinterpret_cast<void*>(winhv_base + funcs_w[ords_w[i]]); }
+					        { auto a = name; auto b = s_WHvGetVirtualProcessorRegisters; int eq = 1; while (*a || *b) { if (*a != *b) { eq = 0; break; }++a; ++b; } if (eq) pWHvGetVirtualProcessorRegisters = reinterpret_cast<void*>(winhv_base + funcs_w[ords_w[i]]); }
+					        { auto a = name; auto b = s_WHvDeleteVirtualProcessor; int eq = 1; while (*a || *b) { if (*a != *b) { eq = 0; break; }++a; ++b; } if (eq) pWHvDeleteVirtualProcessor = reinterpret_cast<void*>(winhv_base + funcs_w[ords_w[i]]); }
+					        { auto a = name; auto b = s_WHvUnmapGpaRange; int eq = 1; while (*a || *b) { if (*a != *b) { eq = 0; break; }++a; ++b; } if (eq) pWHvUnmapGpaRange = reinterpret_cast<void*>(winhv_base + funcs_w[ords_w[i]]); }
+					        { auto a = name; auto b = s_WHvDeletePartition; int eq = 1; while (*a || *b) { if (*a != *b) { eq = 0; break; }++a; ++b; } if (eq) pWHvDeletePartition = reinterpret_cast<void*>(winhv_base + funcs_w[ords_w[i]]); }
+					        { auto a = name; auto b = s_WHvRunVirtualProcessor; int eq = 1; while (*a || *b) { if (*a != *b) { eq = 0; break; }++a; ++b; } if (eq) pWHvRunVirtualProcessor = reinterpret_cast<void*>(winhv_base + funcs_w[ords_w[i]]); }
+					
+					        if (pWHvGetCapability && pWHvCreatePartition && pWHvSetupPartition && pWHvMapGpaRange && pWHvCreateVirtualProcessor && pWHvSetVirtualProcessorRegisters && pWHvGetVirtualProcessorRegisters && pWHvDeleteVirtualProcessor && pWHvUnmapGpaRange && pWHvDeletePartition && pWHvRunVirtualProcessor)
+					            break;
+					
+					    }
+					
+					    if (!pWHvGetCapability || !pWHvCreatePartition || !pWHvSetupPartition || !pWHvMapGpaRange || !pWHvCreateVirtualProcessor || !pWHvSetVirtualProcessorRegisters || !pWHvGetVirtualProcessorRegisters || !pWHvRunVirtualProcessor || !pWHvDeleteVirtualProcessor || !pWHvDeletePartition || !pWHvUnmapGpaRange)
+					        return static_cast<UINT64>(-40);
+					
+					    auto WHvGetCapability = reinterpret_cast<WHvGetCapability_t>(pWHvGetCapability);
+					    auto WHvCreatePartition = reinterpret_cast<WHvCreatePartition_t>(pWHvCreatePartition);
+					    auto WHvSetPartitionProperty = reinterpret_cast<WHvSetPartitionProperty_t>(pWHvSetPartitionProperty);
+					    auto WHvSetupPartition = reinterpret_cast<WHvSetupPartition_t>(pWHvSetupPartition);
+					    auto WHvMapGpaRange = reinterpret_cast<WHvMapGpaRange_t>(pWHvMapGpaRange);
+					    auto WHvCreateVirtualProcessor = reinterpret_cast<WHvCreateVirtualProcessor_t>(pWHvCreateVirtualProcessor);
+					    auto WHvSetVirtualProcessorRegisters = reinterpret_cast<WHvSetVirtualProcessorRegisters_t>(pWHvSetVirtualProcessorRegisters);
+					    auto WHvGetVirtualProcessorRegisters = reinterpret_cast<WHvGetVirtualProcessorRegisters_t>(pWHvGetVirtualProcessorRegisters);
+					    auto WHvDeleteVirtualProcessor = reinterpret_cast<WHvDeleteVirtualProcessor_t>(pWHvDeleteVirtualProcessor);
+					    auto WHvUnmapGpaRange = reinterpret_cast<WHvUnmapGpaRange_t>(pWHvUnmapGpaRange);
+					    auto WHvDeletePartition = reinterpret_cast<WHvDeletePartition_t>(pWHvDeletePartition);
+					    auto WHvRunVirtualProcessor = reinterpret_cast<WHvRunVirtualProcessor_t>(pWHvRunVirtualProcessor);
+					
+					    // Temos a feature de Hypervisor Ativa ?
+					    BOOL available = FALSE;
+					    if (FAILED(WHvGetCapability(WHvCapabilityCodeHypervisorPresent, &available, sizeof(available), NULL)) || !available) return static_cast<UINT64>(-50);
+					
+					    // Criando uma partição.
+					    WHV_PARTITION_HANDLE partition = NULL;
+					    if (FAILED(WHvCreatePartition(&partition)) || !partition) return static_cast<UINT64>( -51);
+					
+					    // Definindo a propriedade do processor count para suportar no mínimo 1 virtual processor.
+					    {
+					        WHV_PARTITION_PROPERTY prop;
+					        auto pp = reinterpret_cast<unsigned char*>(&prop);
+					        for (auto i = 0; i < sizeof(prop); ++i) pp[i] = 0;
+					        prop.ProcessorCount = 1;
+					        WHvSetPartitionProperty(partition, WHvPartitionPropertyCodeProcessorCount, &prop, sizeof(prop));
+					    }
+					
+					    if (FAILED(WHvSetupPartition(partition))) { WHvDeletePartition(partition); return static_cast<UINT64>(-52); }
+					
+					    // ALocando memória para usarmos na nossa guest
+					    auto fnVA = reinterpret_cast<VA_t>(fnVirtualAlloc);
+					    const SIZE_T memory_size = 0x20000; // 128KB é o suficiente, o shellcode da RyujinMiniVM não deve passar disso.
+					    auto hostMemory = fnVA(NULL, memory_size, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+					    if (!hostMemory) { WHvDeletePartition(partition); return static_cast<UINT64>(-53); }
+					
+					    // Garantindo que não tenha lixo que possa cagar o caralho da GUEST
+					    auto hm = reinterpret_cast<unsigned char*>(hostMemory);
+					    for (auto i = 0; i < memory_size; ++i) hm[i] = 0;
+					
+					    // MAPing da GPA - Usando númeric flags = 7
+					    const UINT32 FLAGS_RWEXEC = 0x1u | 0x2u | 0x4u;
+					    if (FAILED(WHvMapGpaRange(partition, hostMemory, 0, static_cast<UINT64>(memory_size), FLAGS_RWEXEC))) {
+					
+					        auto fnVF = reinterpret_cast<VF_t>(fnVirtualFree);
+					        fnVF(hostMemory, 0, MEM_RELEASE);
+					        WHvDeletePartition(partition);
+					        
+					        return static_cast<UINT64>(-54);
+					    }
+					
+					    // Constantes de layout para o GUEST
+					    const UINT64 PML4_GPA = 0x0000ULL;
+					    const UINT64 PDPT_GPA = 0x1000ULL;
+					    const UINT64 PD_GPA = 0x2000ULL;
+					    const UINT64 PT_GPA = 0x3000ULL;
+					    const UINT64 GDT_GPA = 0x4000ULL;
+					    const UINT64 SHELL_GPA = 0x5000ULL;
+					    const UINT64 RESULT_GPA = 0x7000ULL;
+					    const UINT64 STACK_GPA = 0xFF00ULL;
+					
+					    // Configurando/escrevendo as configurações da page table do Guest
+					    {
+					        
+					        const UINT64 entry_flags = 0x003ULL;
+					        *reinterpret_cast<UINT64*>(reinterpret_cast<uintptr_t>(hostMemory) + static_cast<size_t>(PML4_GPA + 0x0)) = PDPT_GPA | entry_flags;
+					        *reinterpret_cast<UINT64*>(reinterpret_cast<uintptr_t>(hostMemory) + static_cast<size_t>(PDPT_GPA + 0x0)) = PD_GPA | entry_flags;
+					        *reinterpret_cast<UINT64*>(reinterpret_cast<uintptr_t>(hostMemory) + static_cast<size_t>(PD_GPA + 0x0)) = PT_GPA | entry_flags;
+					        for (auto i = 0; i < 32; ++i) {
+					
+					            auto phys = static_cast<UINT64>(i * 0x1000);
+					            *reinterpret_cast<UINT64*>(reinterpret_cast<uintptr_t>(hostMemory) + static_cast<size_t>(PT_GPA + (i * 8))) = phys | entry_flags;
+					        
+					        }
+					
+					    }
+					
+					    // Fazendo setup da GDT
+					    {
+					
+					        auto gdt_ptr = reinterpret_cast<uint64_t*>(reinterpret_cast<uintptr_t>(hostMemory) + static_cast<size_t>(GDT_GPA));
+					        gdt_ptr[0] = 0;
+					        uint64_t desc_code = 0;
+					        desc_code = (0xFFFFF & 0xFFFFu);
+					        desc_code |= static_cast<uint64_t>((0 & 0xFFFFFFu) << 16);
+					        desc_code |= static_cast<uint64_t>(0x9A << 40);
+					        desc_code |= static_cast<uint64_t>(((0xFFFFF >> 16) & 0xFu) << 48);
+					        desc_code |= static_cast<uint64_t>((0x0A & 0xFu) << 52);
+					        desc_code |= static_cast<uint64_t>(((0 >> 24) & 0xFFu) << 56);
+					        gdt_ptr[1] = desc_code;
+					        auto desc_data = desc_code;
+					        desc_data &= ~(static_cast<uint64_t>(0xFF) << 40); desc_data |= static_cast<uint64_t>(0x92) << 40;
+					        desc_data &= ~(static_cast<uint64_t>(0xF) << 52); desc_data |= static_cast<uint64_t>(0x0C & 0xFu) << 52;
+					        gdt_ptr[2] = desc_data;
+					
+					    }
+					
+					    // Alterando shellcode para adicionar os endereços alocados pelo host ao shellcode que executara na guest (mov rdx imm64 -> 48 BA, mov rcx imm64 -> 48 B9)
+					    {
+					        const size_t raw_sz = sizeof(raw);
+					        int found_rdx = 0, found_rcx = 0;
+					        for (auto i = 0; i + 1 < raw_sz; ++i) {
+					
+					            if (!found_rdx && raw[i] == 0x48 && raw[i + 1] == 0xBA) {
+					            
+					                auto v = rdx_arg;
+					                for (auto k = 0; k < 8; ++k) raw[i + 2 + k] = static_cast<unsigned char>((v >> (k * 8)) & 0xFF);
+					                found_rdx = 1;
+					        
+					            }
+					            if (!found_rcx && raw[i] == 0x48 && raw[i + 1] == 0xB9) {
+					
+					                auto v = rcx_arg;
+					                for (auto k = 0; k < 8; ++k) raw[i + 2 + k] = static_cast<unsigned char>((v >> (k * 8)) & 0xFF);
+					                found_rcx = 1;
+					            
+					            }
+					            if (found_rdx && found_rcx) break;
+					        
+					        }
+					        // Alterando o RET(0xC3) no fim do shellcode stub da minivm por um HLT(0xF4) para gerar um execption para indicar o fim da execução do mesmo.
+					        for (auto i = raw_sz; i > 0; --i)
+					            if (raw[i - 1] == 0xC3) { raw[i - 1] = 0xF4; break; }
+					        
+					        // Copiando shellcode para memória do guest
+					        auto dest = reinterpret_cast<unsigned char*>(hostMemory) + static_cast<size_t>(SHELL_GPA);
+					        for (auto i = 0; i < raw_sz; ++i) dest[i] = raw[i];
+					
+					        // Certificando que não temos lixo na região que armazenaremos o resultado na guest
+					        auto res = reinterpret_cast<unsigned char*>(hostMemory) + static_cast<size_t>(RESULT_GPA);
+					        for (auto i = 0; i < 256; ++i) res[i] = 0;
+					    
+					    }
+					
+					    // Criando um VCPU
+					    if (FAILED(WHvCreateVirtualProcessor(partition, 0, 0))) {
+					
+					        WHvUnmapGpaRange(partition, 0, static_cast<UINT64>(0x20000));
+					        auto fnVF = reinterpret_cast<VF_t>(fnVirtualFree);
+					        fnVF(hostMemory, 0, MEM_RELEASE);
+					        WHvDeletePartition(partition);
+					        
+					        return static_cast<UINT64>(-60);
+					    }
+					
+					    // Setup dos Regs Base
+					    {
+					        const WHV_REGISTER_NAME regs[] = {
+					
+					            WHvX64RegisterRip, WHvX64RegisterRsp, WHvX64RegisterCr0, WHvX64RegisterCr3,
+					            WHvX64RegisterCr4, WHvX64RegisterEfer, WHvX64RegisterCs, WHvX64RegisterDs,
+					            WHvX64RegisterEs, WHvX64RegisterFs, WHvX64RegisterGs, WHvX64RegisterSs,
+					            WHvX64RegisterGdtr, WHvX64RegisterIdtr, WHvX64RegisterPat
+					        
+					        };
+					        
+					        WHV_REGISTER_VALUE values[_countof(regs)];
+					        auto pv = reinterpret_cast<unsigned char*>(values);
+					        
+					        for (auto i = 0; i < sizeof(values); ++i) pv[i] = 0;
+					
+					        values[0].Reg64 = SHELL_GPA;
+					        values[1].Reg64 = STACK_GPA;
+					        values[2].Reg64 = 0x80000001ULL;
+					        values[3].Reg64 = PML4_GPA;
+					        values[4].Reg64 = 0x20ULL;
+					        values[5].Reg64 = 0xD00ULL;
+					        values[6].Segment.Base = 0; values[6].Segment.Limit = 0xFFFFFFFF; values[6].Segment.Selector = 1 * 8; values[6].Segment.Attributes = 0xA09B;
+					        
+					        for (auto i = 7; i <= 11; ++i) { values[i].Segment.Base = 0; values[i].Segment.Limit = 0xFFFFFFFF; values[i].Segment.Selector = 2 * 8; values[i].Segment.Attributes = 0xC093; }
+					        
+					        values[12].Table.Base = GDT_GPA; values[12].Table.Limit = (3 * sizeof(uint64_t)) - 1;
+					        values[13].Table.Base = 0; values[13].Table.Limit = 0;
+					        values[14].Reg64 = 0x0007040600070406ULL;
+					
+					        if (FAILED(WHvSetVirtualProcessorRegisters(partition, 0, regs, static_cast<UINT32>(_countof(regs)), values))) {
+					
+					            WHvDeleteVirtualProcessor(partition, 0);
+					            WHvUnmapGpaRange(partition, 0, static_cast<UINT64>(0x20000));
+					            auto fnVF = reinterpret_cast<VF_t>(fnVirtualFree);
+					            fnVF(hostMemory, 0, MEM_RELEASE);
+					            WHvDeletePartition(partition);
+					
+					            return static_cast<UINT64>(-61);
+					        }
+					    }
+					
+					    // Vamos rodar a guest e quando recebermos uma exit reason para exception com hlt. capturaremos o resultado do processamento do shellcode da minivm stub em RAX
+					    UINT64 guest_rax = 0;
+					    for (;;) {
+					
+					        WHV_RUN_VP_EXIT_CONTEXT exitContext;
+					        unsigned char* ecp = (unsigned char*)&exitContext;
+					        for (size_t i = 0; i < sizeof(exitContext); ++i) ecp[i] = 0;
+					        HRESULT hr = WHvRunVirtualProcessor(partition, 0, &exitContext, (UINT32)sizeof(exitContext));
+					        if (FAILED(hr)) break;
+					
+					        if (exitContext.ExitReason == WHvRunVpExitReasonX64Halt) {
+					
+					            WHV_REGISTER_NAME rn = WHvX64RegisterRax;
+					            WHV_REGISTER_VALUE rv;
+					            auto rp = reinterpret_cast<unsigned char*>(&rv);
+					            for (auto i = 0; i < sizeof(rv); ++i) rp[i] = 0;
+					            if (SUCCEEDED(WHvGetVirtualProcessorRegisters(partition, 0, &rn, 1, &rv))) guest_rax = rv.Reg64;
+					            
+					            break;
+					        }
+					        else if (exitContext.ExitReason == WHvRunVpExitReasonX64Cpuid) {
+					
+					            WHV_REGISTER_NAME cpureg[4] = { WHvX64RegisterRax, WHvX64RegisterRbx, WHvX64RegisterRcx, WHvX64RegisterRdx };
+					            WHV_REGISTER_VALUE cpv[4];
+					            auto cp = reinterpret_cast<unsigned char*>(cpv);
+					            for (auto i = 0; i < sizeof(cpv); ++i) cp[i] = 0;
+					            WHvSetVirtualProcessorRegisters(partition, 0, cpureg, 4, cpv);
+					            
+					            continue;
+					        }
+					        else
+					            break;
+					
+					    }
+					
+					    // Limpando processor, unamp do gpa, memória na host e deletando partition do HV
+					    WHvDeleteVirtualProcessor(partition, 0);
+					    WHvUnmapGpaRange(partition, 0, static_cast<UINT64>(0x20000));
+					    {
+					        auto fnVF = reinterpret_cast<VF_t>(fnVirtualFree);
+					        fnVF(hostMemory, 0, MEM_RELEASE);
+					    }
+					    WHvDeletePartition(partition);
+					
+					    return guest_rax;
+					}
+				#pragma optimize("", on)
+				*/
 				0x48, 0x89, 0x54, 0x24, 0x10, 0x48, 0x89, 0x4C, 0x24, 0x08, 0x57, 0x48,
 				0x81, 0xEC, 0x10, 0x0C, 0x00, 0x00, 0xB8, 0x02, 0x00, 0x00, 0x00, 0x48,
 				0x6B, 0xC0, 0x00, 0xB9, 0x6B, 0x00, 0x00, 0x00, 0x66, 0x89, 0x8C, 0x04,
