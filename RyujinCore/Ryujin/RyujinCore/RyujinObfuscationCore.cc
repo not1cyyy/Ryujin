@@ -2589,10 +2589,177 @@ std::vector<ZyanU8> RyujinObfuscationCore::RunMiniVmObfuscation() {
 	auto origBlocks = m_proc.basic_blocks;
 	auto originalOpcodes = this->getProcessedProc().getUpdateOpcodes();
 
-	// Obfuscating and adding padding bytes..
-	addPaddingSpaces();
+	auto mutateMiniVm = [&]() {
+
+		// Helper function to convert ZydisRegister from our unused reg to a AsmJit standard AsmJit x86::Gp
+		auto zydisToAsmJitGp = [&](ZydisRegister zydisReg) -> asmjit::x86::Gp {
+
+			switch (zydisReg) {
+			
+				case ZYDIS_REGISTER_RAX: return asmjit::x86::rax;
+				case ZYDIS_REGISTER_RBX: return asmjit::x86::rbx;
+				case ZYDIS_REGISTER_RCX: return asmjit::x86::rcx;
+				case ZYDIS_REGISTER_RDX: return asmjit::x86::rdx;
+				case ZYDIS_REGISTER_RSI: return asmjit::x86::rsi;
+				case ZYDIS_REGISTER_RDI: return asmjit::x86::rdi;
+				case ZYDIS_REGISTER_RBP: return asmjit::x86::rbp;
+				case ZYDIS_REGISTER_RSP: return asmjit::x86::rsp;
+				case ZYDIS_REGISTER_R8:  return asmjit::x86::r8;
+				case ZYDIS_REGISTER_R9:  return asmjit::x86::r9;
+				case ZYDIS_REGISTER_R10: return asmjit::x86::r10;
+				case ZYDIS_REGISTER_R11: return asmjit::x86::r11;
+				case ZYDIS_REGISTER_R12: return asmjit::x86::r12;
+				case ZYDIS_REGISTER_R13: return asmjit::x86::r13;
+				case ZYDIS_REGISTER_R14: return asmjit::x86::r14;
+				case ZYDIS_REGISTER_R15: return asmjit::x86::r15;
+				case ZYDIS_REGISTER_EAX: return asmjit::x86::eax;
+				case ZYDIS_REGISTER_EBX: return asmjit::x86::ebx;
+				case ZYDIS_REGISTER_ECX: return asmjit::x86::ecx;
+				case ZYDIS_REGISTER_EDX: return asmjit::x86::edx;
+				case ZYDIS_REGISTER_ESI: return asmjit::x86::esi;
+				case ZYDIS_REGISTER_EDI: return asmjit::x86::edi;
+				case ZYDIS_REGISTER_EBP: return asmjit::x86::ebp;
+				case ZYDIS_REGISTER_ESP: return asmjit::x86::esp;
+				default: return asmjit::x86::rax;
+			
+			}
+
+		};
+
+		// Initializing AsmJit
+		asmjit::JitRuntime runtime;
+
+		for (auto& block : m_proc.basic_blocks) {
+			
+			// Vector to store the opcodes related to the current context basic block
+			std::vector<std::vector<ZyanU8>> new_instructions;
+
+			for (auto& opcode : block.opcodes) {
+				
+				// Saving all original opcodes of the basic block
+				std::vector<ZyanU8> new_opcodes;
+				for (auto individual_opcode : opcode)
+					new_opcodes.push_back(individual_opcode);
+
+				// Adding them to the main control vector
+				new_instructions.push_back(new_opcodes);
+
+				std::vector<ZydisRegister> safe_unused_registers;
+				for (auto reg : m_unusedRegisters) {
+
+					// This includes registers that might be used implicitly by certain instructions
+					if (reg != ZYDIS_REGISTER_RAX &&
+						reg != ZYDIS_REGISTER_EAX &&
+						reg != ZYDIS_REGISTER_AX &&
+						reg != ZYDIS_REGISTER_AH &&
+						reg != ZYDIS_REGISTER_AL &&
+						reg != ZYDIS_REGISTER_RSP &&
+						reg != ZYDIS_REGISTER_ESP &&
+						reg != ZYDIS_REGISTER_SP &&
+						reg != ZYDIS_REGISTER_RBP &&
+						reg != ZYDIS_REGISTER_EBP &&
+						reg != ZYDIS_REGISTER_BP) {
+						safe_unused_registers.push_back(reg);
+
+					}
+
+				}
+
+				if (safe_unused_registers.empty()) {
+
+					// If theres no unused regs just put the nops
+					std::vector<ZyanU8> nop_padding;
+					asmjit::CodeHolder nop_code;
+					nop_code.init(runtime.environment());
+					asmjit::x86::Assembler a_nop(&nop_code);
+
+					for (auto i = 0; i < MAX_PADDING_SPACE_INSTR; i++) a_nop.nop();
+
+					nop_code.flatten();
+					auto nop_section = nop_code.sectionById(0);
+					const auto nop_buf = nop_section->buffer().data();
+					auto nop_size = nop_section->buffer().size();
+
+					for (auto i = 0; i < nop_size; ++i) nop_padding.push_back(nop_buf[i]);
+					new_instructions.push_back(nop_padding);
+					
+					continue;
+				}
+
+				// Storing generated junk code
+				std::vector<ZyanU8> gen_opcodes;
+
+				// Generate ultra-safe junk code
+				asmjit::CodeHolder code;
+				code.init(runtime.environment());
+				asmjit::x86::Assembler a(&code);
+
+				// Select a random safe unused register
+				std::random_device rd;
+				std::mt19937 gen(rd());
+				std::uniform_int_distribution<> reg_dis(0, safe_unused_registers.size() - 1);
+
+				ZydisRegister selected_zydis_reg = safe_unused_registers[reg_dis(gen)];
+				asmjit::x86::Gp selected_reg = zydisToAsmJitGp(selected_zydis_reg);
+
+				a.push(selected_reg);
+
+				a.mov(selected_reg, selected_reg);
+
+				a.and_(selected_reg, asmjit::imm(0xFFFFFFFF));
+
+				a.add(selected_reg, asmjit::imm(0));
+
+				a.pop(selected_reg);
+
+				code.flatten();
+
+				// Getting the result from JIT
+				auto section = code.sectionById(0);
+				const auto buf = section->buffer().data();
+				auto size = section->buffer().size();
+
+				// Use the generated code
+				for (auto i = 0; i < size; ++i)
+					gen_opcodes.push_back(buf[i]);
+
+				// Pad with NOPs to exactly 40 bytes
+				if (gen_opcodes.size() < MAX_PADDING_SPACE_INSTR) {
+					asmjit::CodeHolder pad_code;
+					pad_code.init(runtime.environment());
+					asmjit::x86::Assembler a_pad(&pad_code);
+
+					int nops_needed = MAX_PADDING_SPACE_INSTR - gen_opcodes.size();
+					for (auto i = 0; i < nops_needed; i++)
+						a_pad.nop();
+
+					pad_code.flatten();
+					auto pad_section = pad_code.sectionById(0);
+					const auto pad_buf = pad_section->buffer().data();
+					auto pad_size = pad_section->buffer().size();
+
+					for (auto i = 0; i < pad_size; ++i)
+						gen_opcodes.push_back(pad_buf[i]);
+				}
+
+				// sanity check for 40 bytes como máximo para junkcode
+				if (gen_opcodes.size() > MAX_PADDING_SPACE_INSTR) {
+					gen_opcodes.resize(40);
+				}
+
+				// Storing in the main vector of the block
+				new_instructions.push_back(gen_opcodes);
+			}
+
+			// Overwrite the original opcodes with new ones
+			block.opcodes.clear();
+			block.opcodes.assign(new_instructions.begin(), new_instructions.end());
+		}
 	
-	//mutateMiniVm();
+	};
+
+	// Mutate/Junk MiniVM Stub
+	mutateMiniVm();
 
 	// Redrawing the basic blocks
 	this->updateBasicBlocksContext();
@@ -2618,7 +2785,7 @@ std::vector<ZyanU8> RyujinObfuscationCore::RunMiniVmObfuscation() {
 
 	// Calculating the instructions before an inserted instruction..
 	auto countInstructionsBefore = [&](size_t offset) {
-	
+
 		return static_cast<int>(std::distance(instGlobalOffsets.begin(), std::lower_bound(instGlobalOffsets.begin(), instGlobalOffsets.end(), offset)));
 	};
 
@@ -2627,16 +2794,16 @@ std::vector<ZyanU8> RyujinObfuscationCore::RunMiniVmObfuscation() {
 	m_obfuscated_bb = bb->createBasicBlocks(newOpcodes.data(), newOpcodes.size(), 0);
 
 	// Lambda to check if the displacement fits in a short..
-	auto fits_int8 = [](int32_t v) { 
-		
+	auto fits_int8 = [](int32_t v) {
+
 		return v >= -128 && v <= 127;
 	};
 
 	// Saving the original opcodes without obfuscation based on an offset
 	auto read_original_byte = [&](size_t off, uint8_t fallback)->uint8_t {
-		
+
 		if (off < originalOpcodes.size()) return originalOpcodes[off];
-	
+
 		return fallback;
 	};
 
@@ -2670,13 +2837,13 @@ std::vector<ZyanU8> RyujinObfuscationCore::RunMiniVmObfuscation() {
 
 			// We have a custom correction logic for each Opcode to ensure nothing breaks when we patch the obfuscated instruction...
 			if (inst.instruction.info.meta.category == ZYDIS_CATEGORY_UNCOND_BR) {
-				
+
 				// Logic for unconditional jumps..
 				if (rawOpcode == 0xEB) {
 
 					// Calculation for short RIP-PIC relocation: length = 2 (opcode + int8)
 					int32_t d = static_cast<int32_t>(static_cast<int64_t>(newTargetOffset) - (static_cast<int64_t>(newJumpOffset) + 2));
-					
+
 					if (fits_int8(d)) {
 
 						opcodeBytes.push_back(0xEB);
@@ -2740,10 +2907,10 @@ std::vector<ZyanU8> RyujinObfuscationCore::RunMiniVmObfuscation() {
 
 					// Calculating custom logic for the jump prefix with 0x0F
 					uint8_t second = rawOpcodeSpecificWithIntelPrefix;
-					
+
 					if (second == 0)
 						second = static_cast<uint8_t>((inst.instruction.operands[0].imm.value.u >> 8) & 0xFF);
-					
+
 					opcodeBytes.push_back(0x0F);
 					opcodeBytes.push_back(second);
 					dispSize = 4;
@@ -2763,12 +2930,12 @@ std::vector<ZyanU8> RyujinObfuscationCore::RunMiniVmObfuscation() {
 			// Composing the new opcodes..
 			std::vector<uint8_t> composed;
 			composed.insert(composed.end(), opcodeBytes.begin(), opcodeBytes.end());
-			if (dispSize == 1) 
+			if (dispSize == 1)
 				composed.push_back(static_cast<uint8_t>(finalDisp & 0xFF));
 			else
 				for (int i = 0; i < 4; ++i) composed.push_back(static_cast<uint8_t>((finalDisp >> (8 * i)) & 0xFF));
 
-			if (newJumpOffset + composed.size() > newOpcodes.size()) 
+			if (newJumpOffset + composed.size() > newOpcodes.size())
 				continue;
 
 			// Writing the new properly fixed instructions..
@@ -2778,7 +2945,6 @@ std::vector<ZyanU8> RyujinObfuscationCore::RunMiniVmObfuscation() {
 
 	return newOpcodes;
 }
-
 
 uint32_t RyujinObfuscationCore::findOpcodeOffset(const uint8_t* data, size_t dataSize, const void* opcode, size_t opcodeSize) {
 
