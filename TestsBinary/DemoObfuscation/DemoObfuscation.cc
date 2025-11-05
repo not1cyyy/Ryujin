@@ -199,17 +199,17 @@ uint32_t mba_encrypt32(uint32_t v, uint32_t key) {
 }
 
 // Normal - Non MBA
-uint32_t mba_sum(uint32_t n20) {
+uint32_t sum(uint32_t n20) {
 
     return n20 + 10;
 }
 
-uint32_t mba_sub(uint32_t n10) {
+uint32_t sub(uint32_t n10) {
 
     return 20 - n10;
 }
 
-uint32_t mba_subadd(uint32_t n400) {
+uint32_t subadd(uint32_t n400) {
 
     return n400 + 8;
 }
@@ -221,12 +221,12 @@ int main(int argc, const char** argv, const char** envp) {
     std::printf("Hello World..\n");
     std::printf("Xdxd..\n");
 
-    auto v3 = mba_sum(20);
+    auto v3 = sum(20);
     std::printf("%x\n", v3);
 
-    auto v4 = mba_sub(10);
+    auto v4 = sub(10);
 
-    auto v5 = mba_subadd(400);
+    auto v5 = subadd(400);
     std::printf("%x\n", v5);
 
     char username[256]{ 0 };
