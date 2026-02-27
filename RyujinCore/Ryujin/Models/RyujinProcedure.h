@@ -19,9 +19,9 @@ public:
 			auto& blocks = block.opcodes;
 
 			for (size_t i = 0; i < blocks.size(); ++i) {
-				const auto& block = blocks[i];
-				if (!block.empty()) {
-					for (const auto& byte : block) {
+				const auto& opcode_entry = blocks[i];
+				if (!opcode_entry.empty()) {
+					for (const auto& byte : opcode_entry) {
 						result.emplace_back(byte);
 					}
 				}
