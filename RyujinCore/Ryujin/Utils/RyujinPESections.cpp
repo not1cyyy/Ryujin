@@ -6,7 +6,7 @@ BOOL RyujinPESections::AddNewSection(const std::string& strInputFilePath, char c
 
 	m_szFile = mappedDiskPE.second;
 
-	m_ucModifiedPeMap = new unsigned char[m_szFile]{ 0 };
+	m_ucModifiedPeMap = static_cast<unsigned char*>(std::calloc(m_szFile, 1));
 
 	std::memcpy(
 
@@ -25,7 +25,7 @@ BOOL RyujinPESections::AddNewSection(const std::string& strInputFilePath, char c
 	m_dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(m_ucModifiedPeMap);
 	if (m_dosHeader->e_magic != IMAGE_DOS_SIGNATURE) {
 
-		delete[] m_ucModifiedPeMap;
+		std::free(m_ucModifiedPeMap);
 
 		return FALSE;
 	}
@@ -33,7 +33,7 @@ BOOL RyujinPESections::AddNewSection(const std::string& strInputFilePath, char c
 	m_ntHeader = reinterpret_cast<PIMAGE_NT_HEADERS>(m_ucModifiedPeMap + m_dosHeader->e_lfanew);
 	if (m_ntHeader->Signature != IMAGE_NT_SIGNATURE) {
 
-		delete[] m_ucModifiedPeMap;
+		std::free(m_ucModifiedPeMap);
 
 		return FALSE;
 	}
@@ -43,7 +43,7 @@ BOOL RyujinPESections::AddNewSection(const std::string& strInputFilePath, char c
 
 		//No space to insert a new section on this PE FILE :(
 
-		delete[] m_ucModifiedPeMap;
+		std::free(m_ucModifiedPeMap);
 
 		return FALSE;
 	}
@@ -120,9 +120,8 @@ BOOL RyujinPESections::ProcessOpcodesNewSection(std::vector<unsigned char>& opco
 
 	if (!m_ucResizedPE) {
 
-		//Failed to realocate PE
-		delete[] m_ucModifiedPeMap;
-		delete[] m_ucResizedPE;
+		//realloc preserves the original block on failure
+		std::free(m_ucModifiedPeMap);
 
 		return FALSE;
 	}
