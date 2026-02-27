@@ -9,9 +9,9 @@
 #include <asmjit/asmjit.h>
 #include <Zydis/Zydis.h>
 #include <Zydis/SharedTypes.h>
-#include "../Models/RyujinProcedure.hh"
-#include "../Models/RyujinObfuscatorConfig.hh"
-#include "../RyujinCore/BasicBlockerBuilder.hh"
+#include "../Models/RyujinProcedure.h"
+#include "../Models/RyujinObfuscatorConfig.h"
+#include "../RyujinCore/BasicBlockerBuilder.h"
 
 class RyujinObfuscationCore {
 

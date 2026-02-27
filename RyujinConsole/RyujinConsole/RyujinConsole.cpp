@@ -5,9 +5,9 @@
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
-#include "RyujinCore.hh"
-#include "RyujinCustomPasses.hh"
-#include "th3rd/argparse.hh"
+#include "RyujinCore.h"
+#include "RyujinCustomPasses.h"
+#include "th3rd/argparse.h"
 
 
 auto main(int argc, char* argv[]) -> int {

@@ -1,4 +1,4 @@
-#include "RyujinPESections.hh"
+#include "RyujinPESections.h"
 
 BOOL RyujinPESections::AddNewSection(const std::string& strInputFilePath, char chSectionName[8]) {
 

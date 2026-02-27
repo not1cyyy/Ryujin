@@ -1,4 +1,4 @@
-#include "RyujinCRC32Utils.hh"
+#include "RyujinCRC32Utils.h"
 
 auto RyujinCRC32Utils::compute_crc(const uint8_t* data, size_t len, uint32_t poly) -> uint32_t {
 

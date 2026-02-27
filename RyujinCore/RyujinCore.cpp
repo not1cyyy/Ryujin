@@ -1,4 +1,4 @@
-#include "RyujinCore.hh"
+#include "RyujinCore.h"
 
 /*
     Disable all optimizations before compile for release - MSVC sucks - Build ryujincore in debug or use contexpr mainly on fix relocs

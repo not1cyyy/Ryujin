@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "RyujinBasicBlock.hh"
+#include "RyujinBasicBlock.h"
 
 class RyujinProcedure {
 

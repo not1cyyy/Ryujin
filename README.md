@@ -65,10 +65,10 @@ void RyujinCustomPassDemo(RyujinProcedure* proc);
 ````
 
 See the class definition here:  
-**[RyujinProcedure.hh](https://github.com/keowu/Ryujin/blob/main/RyujinCore/Ryujin/Models/RyujinProcedure.hh).**
+**[RyujinProcedure.h](https://github.com/keowu/Ryujin/blob/main/RyujinCore/Ryujin/Models/RyujinProcedure.h).**
 
 Example usage is included here:  
-**[RyujinCustomPasses.hh](https://github.com/keowu/Ryujin/blob/main/RyujinConsole/RyujinConsole/RyujinCustomPasses.hh#L11).**
+**[RyujinCustomPasses.h](https://github.com/keowu/Ryujin/blob/main/RyujinConsole/RyujinConsole/RyujinCustomPasses.h#L11).**
 
 No additional configuration changes are required. `RyujinObfuscatorConfig` already exposes the settings needed to register and run custom passes.
 

@@ -1,4 +1,4 @@
-#include "BasicBlockerBuilder.hh"
+#include "BasicBlockerBuilder.h"
 
 bool RyujinBasicBlockerBuilder::isControlFlow(const ZydisDecodedInstruction& instruction) const {
 

@@ -6,7 +6,7 @@
 #include <wx/mstream.h>
 #include <thread>
 #include "resource.h"
-#include "RyujinCore.hh"
+#include "RyujinCore.h"
 
 class RyujinApp : public wxApp {
 

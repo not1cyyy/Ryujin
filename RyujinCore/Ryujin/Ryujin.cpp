@@ -1,4 +1,4 @@
-#include "Ryujin.hh"
+#include "Ryujin.h"
 
 Ryujin::Ryujin(const std::string& strInputFilePath, const std::string& strPdbFilePath, const std::string& strOutputFilePath) {
 

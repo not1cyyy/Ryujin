@@ -4,7 +4,7 @@
 #include <string>
 #include <Zydis/Zydis.h>
 #include <Zydis/SharedTypes.h>
-#include "../../RyujinCore/Ryujin/Models/RyujinProcedure.hh"
+#include "../RyujinCore/Ryujin/Models/RyujinProcedure.h"
 
 #define MAX_PROCEDURES 128
 #define MAX_PROCEDURE_NAME_LEN 128
@@ -38,7 +38,7 @@ public:
     bool m_isHVPass; // Run some features of ryujin using Microsoft Hypervisor Framework API
     bool m_isMutateMiniVM; // Perform the mutation and add full junk code to the Ryujin MiniVM stub, regardless of whether it’s the normal version or the HV pass.
     RyujinObfuscatorProcs m_strProceduresToObfuscate; // Names of the procedures to obfuscate
-    RyujinCallbacks m_callbacks;  // Ryujin Custom Pass Callbacks
+    RyujinCallbacks m_callbacks; // Ryujin Custom Pass Callbacks
 
     static bool RunRyujin(const std::string& strInputFilePath, const std::string& strPdbFilePath, const std::string& strOutputFilePath, RyujinObfuscatorConfig& config) {
 

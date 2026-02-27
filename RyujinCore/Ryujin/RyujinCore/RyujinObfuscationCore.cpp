@@ -1,4 +1,4 @@
-#include "RyujinObfuscationCore.hh"
+#include "RyujinObfuscationCore.h"
 
 RyujinObfuscationCore::RyujinObfuscationCore(const RyujinObfuscatorConfig& config, const RyujinProcedure& proc, uintptr_t ProcImageBase) {
 

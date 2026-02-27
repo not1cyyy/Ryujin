@@ -4,12 +4,12 @@
 #include <iostream>
 #include <memory>
 #include <vector>
-#include "PDB/RyujinPdbParsing.hh"
-#include "Utils/RyujinUtils.hh"
-#include "Models/RyujinObfuscatorConfig.hh"
-#include "RyujinCore/BasicBlockerBuilder.hh"
-#include "RyujinCore/RyujinObfuscationCore.hh"
-#include "Utils/RyujinPESections.hh"
+#include "PDB/RyujinPdbParsing.h"
+#include "Utils/RyujinUtils.h"
+#include "Models/RyujinObfuscatorConfig.h"
+#include "RyujinCore/BasicBlockerBuilder.h"
+#include "RyujinCore/RyujinObfuscationCore.h"
+#include "Utils/RyujinPESections.h"
 
 class Ryujin {
 

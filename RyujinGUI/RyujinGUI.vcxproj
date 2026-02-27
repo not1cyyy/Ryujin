@@ -153,12 +153,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="RyujinApp.cc" />
+    <ClCompile Include="RyujinApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
-    <ClInclude Include="RyujinApp.hh" />
-    <ClInclude Include="RyujinCore.hh" />
+    <ClInclude Include="RyujinApp.h" />
+    <ClInclude Include="RyujinCore.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="RyujinGUI.rc" />

@@ -2,7 +2,7 @@
 #include <Zydis/Zydis.h>
 #include <Zydis/SharedTypes.h>
 #include <vector>
-#include "../Models/RyujinBasicBlock.hh"
+#include "../Models/RyujinBasicBlock.h"
 
 class RyujinBasicBlockerBuilder {
 

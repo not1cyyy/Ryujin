@@ -1,5 +1,5 @@
 #pragma once
-#include "RyujinInstruction.hh"
+#include "RyujinInstruction.h"
 
 class RyujinBasicBlock {
 

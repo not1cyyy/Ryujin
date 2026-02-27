@@ -4,8 +4,8 @@
 #include <vector>
 #include <Windows.h>
 
-#include "RyujinUtils.hh"
-#include "../Utils/RyujinCRC32Utils.hh"
+#include "RyujinUtils.h"
+#include "../Utils/RyujinCRC32Utils.h"
 
 #define ALIGN_UP(value, alignment) ((value + alignment - 1) & ~(alignment - 1))
 #define JACKPOTNUMBER 0x777
