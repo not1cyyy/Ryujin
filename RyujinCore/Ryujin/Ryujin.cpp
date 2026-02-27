@@ -446,10 +446,13 @@ bool Ryujin::run(const RyujinObfuscatorConfig& config, const std::shared_ptr<Ryu
 					    uName.MaximumLength = static_cast<USHORT>(uName.Length + sizeof(wchar_t));
 					    uName.Buffer = static_cast<PWSTR>(winhv_name_stack);
 					
-					    // Hackfix: For stack space
+					    // Ensure stack pages are committed before calling LdrLoadDll.
+					    // In injected shellcode, stack guard pages may not be probed; touching
+					    // boundary bytes forces the OS to commit them without relying on CRT.
 					    volatile unsigned char stack_space[256]{ 0 };
 					    stack_space[0] = (unsigned char)stack_space[0];
 					    stack_space[255] = (unsigned char)stack_space[255];
+
 					
 					    HANDLE hWinHvHandle = NULL;
 					    auto st = fnLdrLoadDll(NULL, 0, reinterpret_cast<UNICODE_STRING*>(&uName), &hWinHvHandle);
@@ -526,11 +529,11 @@ bool Ryujin::run(const RyujinObfuscatorConfig& config, const std::shared_ptr<Ryu
 					    BOOL available = FALSE;
 					    if (FAILED(WHvGetCapability(WHvCapabilityCodeHypervisorPresent, &available, sizeof(available), NULL)) || !available) return static_cast<UINT64>(-50);
 					
-					    // Criando uma partição.
+					    // Criando uma partiï¿½ï¿½o.
 					    WHV_PARTITION_HANDLE partition = NULL;
 					    if (FAILED(WHvCreatePartition(&partition)) || !partition) return static_cast<UINT64>( -51);
 					
-					    // Definindo a propriedade do processor count para suportar no mínimo 1 virtual processor.
+					    // Definindo a propriedade do processor count para suportar no mï¿½nimo 1 virtual processor.
 					    {
 					        WHV_PARTITION_PROPERTY prop;
 					        auto pp = reinterpret_cast<unsigned char*>(&prop);
@@ -541,17 +544,17 @@ bool Ryujin::run(const RyujinObfuscatorConfig& config, const std::shared_ptr<Ryu
 					
 					    if (FAILED(WHvSetupPartition(partition))) { WHvDeletePartition(partition); return static_cast<UINT64>(-52); }
 					
-					    // ALocando memória para usarmos na nossa guest
+					    // ALocando memï¿½ria para usarmos na nossa guest
 					    auto fnVA = reinterpret_cast<VA_t>(fnVirtualAlloc);
-					    const SIZE_T memory_size = 0x20000; // 128KB é o suficiente, o shellcode da RyujinMiniVM não deve passar disso.
+					    const SIZE_T memory_size = 0x20000; // 128KB ï¿½ o suficiente, o shellcode da RyujinMiniVM nï¿½o deve passar disso.
 					    auto hostMemory = fnVA(NULL, memory_size, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 					    if (!hostMemory) { WHvDeletePartition(partition); return static_cast<UINT64>(-53); }
 					
-					    // Garantindo que não tenha lixo que possa cagar o caralho da GUEST
+					    // Garantindo que nï¿½o tenha lixo que possa cagar o caralho da GUEST
 					    auto hm = reinterpret_cast<unsigned char*>(hostMemory);
 					    for (auto i = 0; i < memory_size; ++i) hm[i] = 0;
 					
-					    // MAPing da GPA - Usando númeric flags = 7
+					    // MAPing da GPA - Usando nï¿½meric flags = 7
 					    const UINT32 FLAGS_RWEXEC = 0x1u | 0x2u | 0x4u;
 					    if (FAILED(WHvMapGpaRange(partition, hostMemory, 0, static_cast<UINT64>(memory_size), FLAGS_RWEXEC))) {
 					
@@ -572,7 +575,7 @@ bool Ryujin::run(const RyujinObfuscatorConfig& config, const std::shared_ptr<Ryu
 					    const UINT64 RESULT_GPA = 0x7000ULL;
 					    const UINT64 STACK_GPA = 0xFF00ULL;
 					
-					    // Configurando/escrevendo as configurações da page table do Guest
+					    // Configurando/escrevendo as configuraï¿½ï¿½es da page table do Guest
 					    {
 					        
 					        const UINT64 entry_flags = 0x003ULL;
@@ -608,7 +611,7 @@ bool Ryujin::run(const RyujinObfuscatorConfig& config, const std::shared_ptr<Ryu
 					
 					    }
 					
-					    // Alterando shellcode para adicionar os endereços alocados pelo host ao shellcode que executara na guest (mov rdx imm64 -> 48 BA, mov rcx imm64 -> 48 B9)
+					    // Alterando shellcode para adicionar os endereï¿½os alocados pelo host ao shellcode que executara na guest (mov rdx imm64 -> 48 BA, mov rcx imm64 -> 48 B9)
 					    {
 					        const size_t raw_sz = sizeof(raw);
 					        int found_rdx = 0, found_rcx = 0;
@@ -631,15 +634,15 @@ bool Ryujin::run(const RyujinObfuscatorConfig& config, const std::shared_ptr<Ryu
 					            if (found_rdx && found_rcx) break;
 					        
 					        }
-					        // Alterando o RET(0xC3) no fim do shellcode stub da minivm por um HLT(0xF4) para gerar um execption para indicar o fim da execução do mesmo.
+					        // Alterando o RET(0xC3) no fim do shellcode stub da minivm por um HLT(0xF4) para gerar um execption para indicar o fim da execuï¿½ï¿½o do mesmo.
 					        for (auto i = raw_sz; i > 0; --i)
 					            if (raw[i - 1] == 0xC3) { raw[i - 1] = 0xF4; break; }
 					        
-					        // Copiando shellcode para memória do guest
+					        // Copiando shellcode para memï¿½ria do guest
 					        auto dest = reinterpret_cast<unsigned char*>(hostMemory) + static_cast<size_t>(SHELL_GPA);
 					        for (auto i = 0; i < raw_sz; ++i) dest[i] = raw[i];
 					
-					        // Certificando que não temos lixo na região que armazenaremos o resultado na guest
+					        // Certificando que nï¿½o temos lixo na regiï¿½o que armazenaremos o resultado na guest
 					        auto res = reinterpret_cast<unsigned char*>(hostMemory) + static_cast<size_t>(RESULT_GPA);
 					        for (auto i = 0; i < 256; ++i) res[i] = 0;
 					    
@@ -733,7 +736,7 @@ bool Ryujin::run(const RyujinObfuscatorConfig& config, const std::shared_ptr<Ryu
 					
 					    }
 					
-					    // Limpando processor, unamp do gpa, memória na host e deletando partition do HV
+					    // Limpando processor, unamp do gpa, memï¿½ria na host e deletando partition do HV
 					    WHvDeleteVirtualProcessor(partition, 0);
 					    WHvUnmapGpaRange(partition, 0, static_cast<UINT64>(0x20000));
 					    {
@@ -2353,7 +2356,7 @@ bool Ryujin::run(const RyujinObfuscatorConfig& config, const std::shared_ptr<Ryu
 
 		/*
 			Begin TeaDelKew algorithm Implementation
-			(C) João Vitor(@Keowu) avaliable on https://github.com/keowu/gamespy/blob/main/code_base/Kurumi/TeaDelKewTests/TeaDelKewAlgo.hh#L2
+			(C) Joï¿½o Vitor(@Keowu) avaliable on https://github.com/keowu/gamespy/blob/main/code_base/Kurumi/TeaDelKewTests/TeaDelKewAlgo.hh#L2
 		*/
 
 		// Aligning the data so we can run TeaDelKew
@@ -2686,7 +2689,7 @@ bool Ryujin::run(const RyujinObfuscatorConfig& config, const std::shared_ptr<Ryu
 
 		/*
 			Modifying the stub to adapt and ignore the entry point stub decryption code itself,
-			in a way that skips its size so it doesn’t break the stub
+			in a way that skips its size so it doesnï¿½t break the stub
 			when it decrypts the executable code.
 		*/
 		pattern.assign({
