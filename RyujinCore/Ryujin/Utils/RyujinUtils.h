@@ -167,7 +167,20 @@ namespace RyujinUtils {
 		return szWritten == szBuffer;
 	}
 
-	inline std::pair<unsigned char*, SIZE_T> MapDiskPE(const std::string& strPath) {
+	struct MappedViewDeleter {
+		void operator()(unsigned char* p) const {
+			if (p) ::UnmapViewOfFile(_In_ p);
+		}
+	};
+
+	using MappedViewPtr = std::unique_ptr<unsigned char, MappedViewDeleter>;
+
+	struct MappedPE {
+		MappedViewPtr data;
+		SIZE_T size;
+	};
+
+	inline MappedPE MapDiskPE(const std::string& strPath) {
 
 		auto hFile = ::CreateFileA(
 
@@ -248,7 +261,7 @@ namespace RyujinUtils {
 
 		if (!outData) return { nullptr, 0 };
 
-		return { outData, outSize };
+		return { MappedViewPtr(outData), outSize };
 	}
 
 };

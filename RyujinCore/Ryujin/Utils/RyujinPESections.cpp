@@ -4,23 +4,19 @@ BOOL RyujinPESections::AddNewSection(const std::string& strInputFilePath, char c
 
 	auto mappedDiskPE = RyujinUtils::MapDiskPE(strInputFilePath);
 
-	m_szFile = mappedDiskPE.second;
+	m_szFile = mappedDiskPE.size;
 
 	m_ucModifiedPeMap = static_cast<unsigned char*>(std::calloc(m_szFile, 1));
 
 	std::memcpy(
 
 		m_ucModifiedPeMap,
-		mappedDiskPE.first,
+		mappedDiskPE.data.get(),
 		m_szFile
 
 	);
 
-	::UnmapViewOfFile(
-		
-		_In_ mappedDiskPE.first
-	
-	);
+	// mappedDiskPE.data auto-unmaps when it goes out of scope
 
 	m_dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(m_ucModifiedPeMap);
 	if (m_dosHeader->e_magic != IMAGE_DOS_SIGNATURE) {
