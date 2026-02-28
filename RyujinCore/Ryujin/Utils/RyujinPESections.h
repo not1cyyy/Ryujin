@@ -22,6 +22,30 @@ private:
 	uintptr_t m_szNewSec;
 
 public:
+	RyujinPESections()
+		: m_newSection{}
+		, m_dosHeader{ nullptr }
+		, m_ntHeader{ nullptr }
+		, m_ucModifiedPeMap{ nullptr }
+		, m_szFile{ 0 }
+		, m_ucResizedPE{ nullptr }
+		, m_szNewSec{ 0 }
+	{}
+
+	~RyujinPESections() {
+		// After a successful realloc, m_ucResizedPE owns the buffer
+		// and m_ucModifiedPeMap is stale. Otherwise only m_ucModifiedPeMap is live.
+		if (m_ucResizedPE)
+			std::free(m_ucResizedPE);
+		else if (m_ucModifiedPeMap)
+			std::free(m_ucModifiedPeMap);
+	}
+
+	// Non-copyable, non-movable — raw owning pointers
+	RyujinPESections(const RyujinPESections&) = delete;
+	RyujinPESections& operator=(const RyujinPESections&) = delete;
+	RyujinPESections(RyujinPESections&&) = delete;
+	RyujinPESections& operator=(RyujinPESections&&) = delete;
 
 	uintptr_t getRyujinSectionVA() {
 

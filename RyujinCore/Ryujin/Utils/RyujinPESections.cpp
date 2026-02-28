@@ -25,15 +25,11 @@ BOOL RyujinPESections::AddNewSection(const std::string& strInputFilePath, char c
 	m_dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(m_ucModifiedPeMap);
 	if (m_dosHeader->e_magic != IMAGE_DOS_SIGNATURE) {
 
-		std::free(m_ucModifiedPeMap);
-
 		return FALSE;
 	}
 
 	m_ntHeader = reinterpret_cast<PIMAGE_NT_HEADERS>(m_ucModifiedPeMap + m_dosHeader->e_lfanew);
 	if (m_ntHeader->Signature != IMAGE_NT_SIGNATURE) {
-
-		std::free(m_ucModifiedPeMap);
 
 		return FALSE;
 	}
@@ -42,8 +38,6 @@ BOOL RyujinPESections::AddNewSection(const std::string& strInputFilePath, char c
 	if (m_dosHeader->e_lfanew + sizeof(IMAGE_NT_HEADERS) + sectionTableSize > m_ntHeader->OptionalHeader.SizeOfHeaders) {
 
 		//No space to insert a new section on this PE FILE :(
-
-		std::free(m_ucModifiedPeMap);
 
 		return FALSE;
 	}
@@ -121,10 +115,11 @@ BOOL RyujinPESections::ProcessOpcodesNewSection(std::vector<unsigned char>& opco
 	if (!m_ucResizedPE) {
 
 		//realloc preserves the original block on failure
-		std::free(m_ucModifiedPeMap);
-
 		return FALSE;
 	}
+
+	// realloc succeeded — m_ucResizedPE now owns the buffer
+	m_ucModifiedPeMap = nullptr;
 
 	//Zeroing the extended PE region
 	if (m_szNewSec > m_szFile) std::memset(
